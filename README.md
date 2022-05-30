@@ -1,4 +1,4 @@
-# Foodpals Orbital Team 5113
+# Foodpals -- Orbital Team 5113
 
 Foodpals is a web app built with NextJS and Supabase, aimed at making food delivery cheaper and more flexible for students.
 
@@ -14,7 +14,7 @@ $ npm install
 
 ### Run the application
 
-Start up the local development environment (backend and frontends only) by running:
+Start up the local development environment by running:
 
 ```sh
 $ npm run dev
