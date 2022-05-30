@@ -12,6 +12,14 @@ In the root folder of the repository:
 $ npm install
 ```
 
+### Environment Variables
+
+At the root folder of the repository, execute the following command to set environment variables:
+
+```sh
+$ cp .env.example .env
+```
+
 ### Run the application
 
 Start up the local development environment by running:
