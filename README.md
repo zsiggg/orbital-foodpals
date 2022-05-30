@@ -1,4 +1,4 @@
-# Foodpals Orbital Team 5113
+# Foodpals -- Orbital Team 5113
 
 Foodpals is a web app built with NextJS and Supabase, aimed at making food delivery cheaper and more flexible for students.
 
