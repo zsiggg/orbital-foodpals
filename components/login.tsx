@@ -15,8 +15,13 @@ export default () => {
       alert("Enter password");
     } else {
       const { user, session, error } = await supabase.auth.signIn(formFields);
+
+      if (error) {
+        alert(error.message);
+      } else {
+        router.push("/welcome");
+      }
       //   console.log(user, session, error);
-      router.push("/welcome");
       // print the errors (e.g. email already registered)
     }
   }
