@@ -14,7 +14,7 @@ $ npm install
 
 ### Run the application
 
-Start up the local development environment (backend and frontends only) by running:
+Start up the local development environment by running:
 
 ```sh
 $ npm run dev
