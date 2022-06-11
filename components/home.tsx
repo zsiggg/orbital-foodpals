@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 
-export const Home = () => {
+export const OnBoarding = () => {
   const [show, setShow] = useState(false)
   return (
     <div

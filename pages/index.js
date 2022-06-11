@@ -1,4 +1,4 @@
-import { Home } from '../components/Home'
+import { OnBoarding } from '../components/Home'
 import Head from 'next/head'
 
 const root = () => {
@@ -9,7 +9,7 @@ const root = () => {
         <meta name="keywords" content="food delivery, orbital" />
       </Head>
 
-      <Home />
+      <OnBoarding />
     </div>
   )
 }
