@@ -3,7 +3,7 @@ import { useState, Dispatch, SetStateAction } from 'react'
 import { accomodationArr, AccomDropdown } from './AccomDropdown'
 import { supabase } from '../api'
 
-const Register = () => {
+export const Register = () => {
   async function handleSubmit(e) {
     e.preventDefault()
     if (!formFields.name) {
@@ -214,5 +214,3 @@ const Register = () => {
     </div>
   )
 }
-
-export default Register

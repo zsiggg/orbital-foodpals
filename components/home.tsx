@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
+
 export const Home = () => {
   const [show, setShow] = useState(false)
   return (
