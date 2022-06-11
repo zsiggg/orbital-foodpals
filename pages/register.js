@@ -1,9 +1,11 @@
-import Register from '../components/register'
+import Register from '../components/Register'
 
-export default () => {
-    return (
-        <div className="p-2">
-            <Register />
-        </div>
-    )
+const register = () => {
+  return (
+    <div className="p-2">
+      <Register />
+    </div>
+  )
 }
+
+export default register

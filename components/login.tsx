@@ -1,25 +1,25 @@
-import { LockClosedIcon } from "@heroicons/react/solid";
-import Link from "next/link";
-import Logo from "./logo";
-import { supabase } from "../api";
-import { useState, Dispatch, SetStateAction } from "react";
-import { useRouter } from "next/router";
+import { LockClosedIcon } from '@heroicons/react/solid'
+import Link from 'next/link'
+import { Logo } from './Logo'
+import { supabase } from '../api'
+import { useState, Dispatch, SetStateAction } from 'react'
+import { useRouter } from 'next/router'
 
-export default () => {
-  const router = useRouter();
+export const Login = () => {
+  const router = useRouter()
   async function handleSubmit(e) {
-    e.preventDefault();
+    e.preventDefault()
     if (!formFields.email) {
-      alert("Enter email");
+      alert('Enter email')
     } else if (!formFields.password) {
-      alert("Enter password");
+      alert('Enter password')
     } else {
-      const { user, session, error } = await supabase.auth.signIn(formFields);
+      const { user, session, error } = await supabase.auth.signIn(formFields)
 
       if (error) {
-        alert(error.message);
+        alert(error.message)
       } else {
-        router.push("/welcome");
+        router.push('/welcome')
       }
       //   console.log(user, session, error);
       // print the errors (e.g. email already registered)
@@ -27,17 +27,17 @@ export default () => {
   }
   // not sure if need to include picture
   type FormFields = {
-    email: string;
-    password: string;
-  };
+    email: string
+    password: string
+  }
 
   const [formFields, setFormFields]: [
     FormFields,
-    Dispatch<SetStateAction<FormFields>>
+    Dispatch<SetStateAction<FormFields>>,
   ] = useState({
     email: undefined,
     password: undefined,
-  });
+  })
 
   return (
     <div className="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -45,7 +45,7 @@ export default () => {
         <div>
           <Logo />
           <p className="mt-2 text-center text-sm text-gray-600">
-            Don't have an account yet?{" "}
+            Don&apos;t have an account yet?{' '}
             <Link href="/register">
               <a
                 href="#"
@@ -141,5 +141,5 @@ export default () => {
         </form>
       </div>
     </div>
-  );
-};
+  )
+}

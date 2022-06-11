@@ -1,5 +1,3 @@
-export default () => {
-    return (
-        <p>Reset password page</p>
-    )
+export const resetPassword = () => {
+  return <p>Reset password page</p>
 }

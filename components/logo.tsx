@@ -1,6 +1,6 @@
-import Image from "next/image";
+import Image from 'next/image'
 
-export default () => {
+export const Logo = () => {
   return (
     <>
       <div className="flex justify-center">
@@ -13,5 +13,5 @@ export default () => {
         Order in or deliver at your convenience, right now.
       </p>
     </>
-  );
-};
+  )
+}

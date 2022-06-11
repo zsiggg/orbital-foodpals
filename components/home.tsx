@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import Link from "next/link";
-export default () => {
-  const [show, setShow] = useState(false);
+import React, { useState } from 'react'
+import Link from 'next/link'
+export const Home = () => {
+  const [show, setShow] = useState(false)
   return (
     <div
       className="bg-gray-100 pb-12 overflow-y-hidden"
@@ -57,5 +57,5 @@ export default () => {
         </div>
       </>
     </div>
-  );
-};
+  )
+}

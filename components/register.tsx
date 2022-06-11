@@ -1,70 +1,69 @@
-import Logo from "./logo";
-import { useState, Dispatch, SetStateAction } from "react";
-import AccomDropdown from "./accomDropdown";
-import { accomodationArr } from "./accomDropdown";
-import { supabase } from "../api";
+import { Logo } from './Logo'
+import { useState, Dispatch, SetStateAction } from 'react'
+import { accomodationArr, AccomDropdown } from './AccomDropdown'
+import { supabase } from '../api'
 
-export default () => {
+const Register = () => {
   async function handleSubmit(e) {
-    e.preventDefault();
+    e.preventDefault()
     if (!formFields.name) {
-      alert("Enter your name");
+      alert('Enter your name')
     } else if (!emailRegex.test(formFields.email)) {
-      alert("Please use your NUS email");
+      alert('Please use your NUS email')
     } else if (
-      formFields.accom == "" ||
+      formFields.accom == '' ||
       !accomodationArr.reduce(
         (bool, accomTypeArr) => bool || accomTypeArr.includes(formFields.accom),
-        false
+        false,
       )
     ) {
-      alert("Enter an accomodation");
+      alert('Enter an accomodation')
     } else if (!phoneRegex.test(formFields.phone)) {
       alert(
-        "Enter a Singapore phone number (starting with 8 or 9) and without +65"
-      );
+        'Enter a Singapore phone number (starting with 8 or 9) and without +65',
+      )
     } else if (!confirmPassword || !formFields.password) {
-      alert("Enter password");
+      alert('Enter password')
     } else if (formFields.password.length < 6) {
-      alert("Passwords should be at least 6 characters long");
+      alert('Passwords should be at least 6 characters long')
     } else if (confirmPassword != formFields.password) {
-      alert("Passwords do not match");
+      alert('Passwords do not match')
     } else {
-      console.log(formFields);
+      console.log(formFields)
       const { user, session, error } = await supabase.auth.signUp({
         email: formFields.email,
         password: formFields.password,
-      });
-      console.log(user, session, error);
+      })
+      console.log(user, session, error)
       // print the errors (e.g. email already registered)
     }
   }
 
   // not sure if need to include picture
   type FormFields = {
-    name: string;
-    email: string;
-    accom: string;
-    phone: string;
-    password: string;
-  };
+    name: string
+    email: string
+    accom: string
+    phone: string
+    password: string
+  }
 
-  const emailRegex = /.+(@u.nus.edu)$/;
-  const phoneRegex = /^([8-9][0-9]{7})$/;
+  const emailRegex = /.+(@u.nus.edu)$/
+  const phoneRegex = /^([8-9][0-9]{7})$/
   const [formFields, setFormFields]: [
     FormFields,
-    Dispatch<SetStateAction<FormFields>>
+    Dispatch<SetStateAction<FormFields>>,
   ] = useState({
     name: undefined,
     email: undefined,
     accom: undefined,
     phone: undefined,
     password: undefined,
-  });
+  })
   const [confirmPassword, setConfirmPassword]: [
     string,
-    Dispatch<SetStateAction<string>>
-  ] = useState("");
+    Dispatch<SetStateAction<string>>,
+  ] = useState('')
 
   return (
     <div className="min-h-full flex justify-center items-center py-12 px-4 sm:px-6 lg:px-8">
@@ -213,5 +212,7 @@ export default () => {
         </form>
       </div>
     </div>
-  );
-};
+  )
+}
+
+export default Register

@@ -1,7 +1,17 @@
-import Home from '../components/home'
+import Home from '../components/Home'
+import Head from 'next/head'
 
-export default () => {
+const root = () => {
   return (
-    <Home />
+    <div>
+      <Head>
+        <title>Foodpals</title>
+        <meta name="keywords" content="food delivery, orbital" />
+      </Head>
+
+      <Home />
+    </div>
   )
 }
+
+export default root
