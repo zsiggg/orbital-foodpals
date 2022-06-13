@@ -1,31 +1,35 @@
-import { LockClosedIcon } from '@heroicons/react/solid'
-import Link from 'next/link'
+import { LockClosedIcon } from "@heroicons/react/solid";
+import Link from "next/link";
 import { Logo } from './Logo'
-import { supabase } from '../api'
-import { useState, Dispatch, SetStateAction } from 'react'
-import { useRouter } from 'next/router'
-
+import { useState, Dispatch, SetStateAction } from "react";
+import { useRouter } from "next/router";
+import { useUser } from "@supabase/auth-helpers-react";
+import { useAlert } from "../helpers/alertContext";
+import { supabaseClient } from "@supabase/auth-helpers-nextjs";
+//
 export const Login = () => {
-  const router = useRouter()
+  const [alert, setAlert] = useAlert()
+  const router = useRouter();
+  const { user, error } = useUser()
+  if (user) {
+    router.push('/welcome')
+  }
+
   async function handleSubmit(e) {
     e.preventDefault()
     if (!formFields.email) {
-      alert('Enter email')
+      setAlert({ type: 'info', message: "Enter email" });
     } else if (!formFields.password) {
-      alert('Enter password')
+      setAlert({ type: 'info', message: "Enter password" });
     } else {
-      const { user, session, error } = await supabase.auth.signIn(formFields)
+      const { user, session, error } = await supabaseClient.auth.signIn(formFields);
 
       if (error) {
-        alert(error.message)
-      } else {
-        router.push('/welcome')
+        setAlert({ type: 'warning', message: error.message });
       }
-      //   console.log(user, session, error);
-      // print the errors (e.g. email already registered)
     }
   }
-  // not sure if need to include picture
+
   type FormFields = {
     email: string
     password: string

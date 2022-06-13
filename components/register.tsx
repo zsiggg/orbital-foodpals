@@ -1,15 +1,21 @@
-import { Logo } from './Logo'
-import { useState, Dispatch, SetStateAction } from 'react'
-import { accomodationArr, AccomDropdown } from './AccomDropdown'
-import { supabase } from '../api'
+import { Logo } from "./Logo";
+import { useState, Dispatch, SetStateAction } from "react";
+import { accomodationArr, AccomDropdown } from "./AccomDropdown"
+import { supabaseClient } from '@supabase/auth-helpers-nextjs'
+import { useRouter } from 'next/router'
+import { useAlert } from '../helpers/alertContext'
+import { Alert } from './Alert'
+//
+export const Register =  () => {
+  const router = useRouter()
+  const [alert, setAlert] = useAlert()
 
-export const Register = () => {
   async function handleSubmit(e) {
     e.preventDefault()
     if (!formFields.name) {
-      alert('Enter your name')
+      setAlert({ type: 'info', message: "Enter your name" });
     } else if (!emailRegex.test(formFields.email)) {
-      alert('Please use your NUS email')
+      setAlert({ type: 'info', message: "Please use your NUS email" });
     } else if (
       formFields.accom == '' ||
       !accomodationArr.reduce(
@@ -17,25 +23,29 @@ export const Register = () => {
         false,
       )
     ) {
-      alert('Enter an accomodation')
+      setAlert({ type: 'info', message: "Enter an accomodation" } );
     } else if (!phoneRegex.test(formFields.phone)) {
-      alert(
-        'Enter a Singapore phone number (starting with 8 or 9) and without +65',
-      )
+      setAlert({ type: 'info', message: 
+        "Enter a Singapore phone number (starting with 8 or 9) and without +65"
+      });
     } else if (!confirmPassword || !formFields.password) {
-      alert('Enter password')
+      setAlert({ type: 'info', message: "Enter password" });
     } else if (formFields.password.length < 6) {
-      alert('Passwords should be at least 6 characters long')
+      setAlert({ type: 'info', message: "Passwords should be at least 6 characters long" });
     } else if (confirmPassword != formFields.password) {
-      alert('Passwords do not match')
+      setAlert({ type: 'warning', message: "Passwords do not match" });
     } else {
-      console.log(formFields)
-      const { user, session, error } = await supabase.auth.signUp({
+      const { user, session, error } = await supabaseClient.auth.signUp({
         email: formFields.email,
         password: formFields.password,
-      })
-      console.log(user, session, error)
-      // print the errors (e.g. email already registered)
+      });
+      if (error) {
+        setAlert({type: 'danger', message: error.status + ": " + error.message })
+      } else {
+        router.push('/login')
+        setAlert({ type: 'success', message: 'A confirmation message has been sent to your email if it is not associated with an existing account' })
+        // send a message -> a confirmation message has been sent to your email, if your email is not associated with an existing account
+      }
     }
   }
 
@@ -66,6 +76,8 @@ export const Register = () => {
   ] = useState('')
 
   return (
+    <>
+    <Alert />
     <div className="min-h-full flex justify-center items-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="bg-white max-w-md w-full rounded-lg shadow-lg p-10">
         <Logo />
@@ -212,5 +224,6 @@ export const Register = () => {
         </form>
       </div>
     </div>
-  )
-}
+    </>
+  );
+};
