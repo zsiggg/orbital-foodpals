@@ -35,7 +35,7 @@ type incomingOrder = {
 }
 
 
-const incomingOrder = ({ user }) => {
+const IncomingOrder = ({ user }) => {
     const router = useRouter()
     const [alert, setAlert] = useAlert()
 
@@ -55,14 +55,14 @@ const incomingOrder = ({ user }) => {
                     .filter('id', 'eq', orderId)
                     .filter('deliverer_id', 'is', 'NULL')
                 if (ordersError) {
-                    router.push('/welcome')
+                    router.push('/home')
                     setAlert({ type: 'warning', message: ordersError.code + ': ' + ordersError.message })
                     console.log(ordersError)
                     return
                 }
                 
                 if (ordersData.length == 0) {
-                    router.push('/welcome')
+                    router.push('/home')
                     setAlert({ type: 'info', message: 'Order has been taken'})
                     return
                 }
@@ -72,7 +72,7 @@ const incomingOrder = ({ user }) => {
                     .select('id, name')
                     .filter('id', 'eq', ordersData[0].restaurant_id)
                 if (restaurantsError) {
-                    router.push('/welcome')
+                    router.push('/home')
                     setAlert({ type: 'warning', message: restaurantsError.code + ': ' + restaurantsError.message })
                     console.log(restaurantsError)
                     return
@@ -83,7 +83,7 @@ const incomingOrder = ({ user }) => {
                     .select('id, name')
                     .filter('id', 'eq', ordersData[0].destination_id)
                 if (destinationsError) {
-                    router.push('/welcome')
+                    router.push('/home')
                     setAlert({ type: 'warning', message: destinationsError.code + ': ' + destinationsError.message })
                     console.log(destinationsError)
                     return
@@ -118,7 +118,7 @@ const incomingOrder = ({ user }) => {
         } else {
             setAlert({ type: 'info', message: 'Rejected order' })
         }
-        router.push('/welcome')
+        router.push('/home')
     }
 
     async function handleAccept() {
@@ -138,17 +138,17 @@ const incomingOrder = ({ user }) => {
                 .filter('id', 'eq', orderId)
                 .filter('deliverer_id', 'is', 'NULL')
             if (ordersError) {
-                router.push('/welcome')
+                router.push('/home')
                 setAlert({ type: 'warning', message: ordersError.code + ': ' + ordersError.message })
                 console.log(ordersError)
             }
             
             if (ordersData.length == 0) {
-                router.push('/welcome')
+                router.push('/home')
                 setAlert({ type: 'info', message: 'Order has been taken'})
             }
         } else {
-            router.push('/welcome')
+            router.push('/home')
             setAlert({type: 'success', message: 'Accepted order' })
         }
 
@@ -162,31 +162,36 @@ const incomingOrder = ({ user }) => {
     
     return (
         <>
-        <section className="flex flex-col justify-center items-center">
-        <section>
-            {!order && <p>Loading...</p>}
+        <section className="flex flex-col h-screen justify-center sm:h-auto sm:justify-start items-center space-y-5 sm:mt-8">
+            <section className="border border-gray-300 p-5 rounded-md max-w-xs sm:max-w-md">
+                {!order && <p>Loading...</p>}
 
-            {order && (<>
-                <p>Order info</p>
-                <p>{order.id}</p>
-                <p>{order.restaurant}</p>
-                <p>{order.order}</p>
-                <p>{order.deliveryLocation}</p>
-                <p>{order.amount}</p>
-                <p>{order.orderedAt.toLocaleTimeString(undefined,{hour:'numeric' ,minute:'2-digit', hour12: true})}</p></>)
-            }   
-            
+                {order && (<div className="flex flex-col space-y-3">
+                    <div className="font-bold text-xl">Order #{order.id} ({order.orderedAt.toLocaleTimeString(undefined,{hour:'numeric' ,minute:'2-digit', hour12: true})})</div>
+                        <div className="leading-relaxed">
+                            <p>{order.restaurant}</p>
+                            <p>{order.deliveryLocation}</p>
+                            <p>{order.amount}</p>
+                        </div>
+                        <div className="leading-snug break-words">
+                            <p>{order.order}</p>
+                        </div>
+                    </div>)
+                }   
+            </section>
 
-        </section>
-
-        <section>
-            <button className="border border-teal-300 mr-2" onClick={handleReject}>Reject</button>
-            <button className="border border-teal-300 ml-2" onClick={handleAccept}>Accept</button>
-        </section>
+            <section className="flex space-x-16">
+                <button className="py-2 px-3 bg-red-600 text-sm text-white font-medium rounded-lg border hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition ease-in duration-100" onClick={handleReject}>
+                Reject
+                </button>
+                <button className="py-2 px-3 bg-green-600 text-sm text-white font-medium rounded-lg border hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition ease-in duration-100" onClick={handleAccept}>
+                Accept
+                </button>
+            </section>
         </section>
         </>
     )
 }
 
-export const getServerSideProps = withPageAuth({ redirectTo: '/home' })
-export default incomingOrder
+export const getServerSideProps = withPageAuth({ redirectTo: '/login' })
+export default IncomingOrder

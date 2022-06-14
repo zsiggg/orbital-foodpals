@@ -1,19 +1,29 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '../api'
+import { supabaseClient, withPageAuth } from '@supabase/auth-helpers-nextjs'
 import { OrderCard } from './OrderCard'
 import Head from 'next/head'
 
 import React from 'react'
+import { useUser } from '@supabase/auth-helpers-react'
 
 export const DelivererHome = () => {
   const [orders, setOrders] = useState([])
+  const { user, error } = useUser()
 
   useEffect(() => {
     const loadOrders = async () => {
-      const { data, error } = await supabase.from('orders').select('*')
-      setOrders(data)
+      // const { data, error } = await supabase.from('orders').select('*')
+
+      // select from pending orders array in users; bc of RLS, user will only select own roww
+      const { data: orderIds, error: orderIdsError } = await supabaseClient.from('users').select('pending_orders')
+      if (orderIds.length > 0) {
+        const { data, error } = await supabaseClient.from('orders').select('*').in('id', orderIds[0].pending_orders)
+        setOrders(data)
+      }
     }
-    loadOrders()
+    if (user) {
+      loadOrders()
+    }
   }, [])
 
   return (
