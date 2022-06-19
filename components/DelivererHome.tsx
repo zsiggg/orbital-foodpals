@@ -15,16 +15,23 @@ export const DelivererHome = () => {
       // const { data, error } = await supabase.from('orders').select('*')
 
       // select from pending orders array in users; bc of RLS, user will only select own roww
-      const { data: orderIds, error: orderIdsError } = await supabaseClient.from('users').select('pending_orders')
+      const { data: orderIds, error: orderIdsError } = await supabaseClient
+        .from('users')
+        .select('pending_orders')
+
       if (orderIds.length > 0) {
-        const { data, error } = await supabaseClient.from('orders').select('*').in('id', orderIds[0].pending_orders)
+        console.log(orderIds)
+        const { data, error } = await supabaseClient
+          .from('orders')
+          .select('*')
+          .in('id', orderIds[0].pending_orders)
         setOrders(data)
       }
     }
     if (user) {
       loadOrders()
     }
-  }, [])
+  }, [user])
 
   return (
     <>

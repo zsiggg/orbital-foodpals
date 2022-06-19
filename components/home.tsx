@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export const OnBoarding = () => {
   const [show, setShow] = useState(false)
@@ -12,10 +13,11 @@ export const OnBoarding = () => {
         <nav className="w-full">
           <div className="py-5 container mx-auto px-6 flex items-center justify-between">
             <div aria-label="Home. logo" role="img">
-              <img
-                className="w-12 md:w-auto"
-                src="https://tuk-cdn.s3.amazonaws.com/can-uploader/centre_aligned_simple-Svg1.svg"
-                alt="logo"
+              <Image
+                alt="Foodpals Logo"
+                src="/tempLogo.svg"
+                width={52.5}
+                height={48}
               />
             </div>
             <Link href="/login">

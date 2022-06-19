@@ -1,5 +1,5 @@
-import { DelivererHome } from '../components/DelivererHome'
-import { Alert } from '../components/Alert'
+import { DelivererHome } from '../../components/DelivererHome'
+import { Alert } from '../../components/Alert'
 import { withPageAuth } from '@supabase/auth-helpers-nextjs'
 
 const delivererHome = () => {
