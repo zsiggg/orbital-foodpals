@@ -4,7 +4,7 @@ export const Logo = () => {
   return (
     <div>
       <div className="flex justify-center">
-        <Image src="/tempLogo.svg" width={52.5} height={48} />
+        <Image src="/tempLogo.svg" width={52.5} height={48} alt="Logo" />
       </div>
       <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
         Foodpals

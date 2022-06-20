@@ -12,8 +12,6 @@ export const DelivererHome = () => {
 
   useEffect(() => {
     const loadOrders = async () => {
-      // const { data, error } = await supabase.from('orders').select('*')
-
       // select from pending orders array in users; bc of RLS, user will only select own roww
       const { data: orderIds, error: orderIdsError } = await supabaseClient
         .from('users')

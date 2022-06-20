@@ -1,29 +1,8 @@
+import type { IncomingOrderDto } from "types/index"
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { supabase } from '../../../api'
 import { useRouter } from 'next/router'
 import { useAlert } from '../../../helpers/alertContext'
 import { supabaseClient, withPageAuth } from '@supabase/auth-helpers-nextjs'
-
-type IncomingOrderDto = {
-  id: number
-  restaurants: RestaurantDto
-  order_text: string
-  deliverer_id: string
-  ordered_at: Date
-  is_active: boolean
-  destinations: DestinationDto
-  cost: number
-}
-
-type RestaurantDto = {
-  id: number
-  name: string
-}
-
-type DestinationDto = {
-  id: number
-  name: string
-}
 
 const IncomingOrder = ({ user }) => {
   const router = useRouter()
@@ -38,21 +17,19 @@ const IncomingOrder = ({ user }) => {
     Dispatch<SetStateAction<IncomingOrderDto>>,
   ] = useState()
 
-  // simulate api call, pass in props.id
   useEffect(() => {
     const query = async () => {
       const { data: ordersData, error: ordersError } = await supabaseClient
         .from<IncomingOrderDto>('orders')
         .select(
-          'id, restaurants (id, name), order_text, ordered_at, is_active, destinations (id, name), cost',
+          'id, restaurants (id, name), order_text, deliverer_id, ordered_at, is_active, destinations (id, name), cost',
         )
         .eq('id', orderId)
-        .is('deliverer_id', null)
         .limit(1)
         .single()
 
       if (ordersError) {
-        router.push('/home')
+        router.push('/deliverer/home')
         setAlert({
           type: 'warning',
           message: ordersError.code + ': ' + ordersError.message,
@@ -61,10 +38,18 @@ const IncomingOrder = ({ user }) => {
         return
       }
 
-      // means a deliverer has already takent the order
+      // means a deliverer has already taken the order
       if (ordersData.deliverer_id) {
-        router.push('/home')
-        setAlert({ type: 'info', message: 'Order has been taken' })
+        const { error: removePendingError } = await supabaseClient.rpc(
+          'remove_pending_order',
+          { order_id: id, user_id: user.id },
+        )
+        if (removePendingError) {
+          setAlert({ type: 'warning', message: removePendingError.code + ': ' + removePendingError.message })
+        } else {
+          setAlert({ type: 'info', message: 'Order has been taken' })
+        }
+        router.push('/deliverer/home')
         return
       }
 
@@ -75,13 +60,10 @@ const IncomingOrder = ({ user }) => {
 
     query()
 
-    //not best practice, need to figure out how to handle this
-  }, [])
+    // orderId is gotten from url, router and setAlert won't change -> ok to put in dependency array
+  }, [orderId, router, setAlert])
 
   async function handleReject() {
-    console.log(
-      'store in db rejected, never show this order on the homescreen again',
-    )
     let error = ''
     const { error: removePendingError } = await supabaseClient.rpc(
       'remove_pending_order',
@@ -104,30 +86,38 @@ const IncomingOrder = ({ user }) => {
     } else {
       setAlert({ type: 'info', message: 'Rejected order' })
     }
-    router.push('/home')
+    router.push('/deliverer/home')
   }
 
   async function handleAccept() {
-    // implement auth to get the user uid
     const { data: updatedOrdersData, error: updatedOrdersError } =
       await supabaseClient
         .from('orders')
-        .update({ id: id, deliverer_id: user.id })
+        .update({ id: id, deliverer_id: user.id, accepted_at: new Date() })
         .eq('id', id)
         .is('is_active', true)
         .is('deliverer_id', null)
 
-    // possible that order has been taken or completed
-    if (updatedOrdersError) {
+    // remove order from pending_orders array in users table
+    const { error: removePendingError } = await supabaseClient.rpc(
+      'remove_pending_order', 
+      { order_id: id, user_id: user.id }
+    )
+
+    if (updatedOrdersError || removePendingError) {
+      console.log(updatedOrdersError, removePendingError)
+
+      // check if error is caused by order being taken, or something else
       const { data: ordersData, error: ordersError } = await supabaseClient
-        .from<IncomingOrderDto>('orders')
+        .from('orders')
         .select(
-          'id, restaurant_id, order_text, deliverer_id, ordered_at, is_active, destination_id, cost',
+          'deliverer_id',
         )
-        .filter('id', 'eq', orderId)
-        .filter('deliverer_id', 'is', 'NULL')
+        .eq('id', orderId)
+        .is('deliverer_id', null)
+
       if (ordersError) {
-        router.push('/home')
+        router.push('/deliverer/home')
         setAlert({
           type: 'warning',
           message: ordersError.code + ': ' + ordersError.message,
@@ -136,21 +126,12 @@ const IncomingOrder = ({ user }) => {
       }
 
       if (ordersData.length == 0) {
-        router.push('/home')
+        router.push('/deliverer/home')
         setAlert({ type: 'info', message: 'Order has been taken' })
       }
     } else {
-      router.push('/home')
+      router.push('/deliverer/home')
       setAlert({ type: 'success', message: 'Accepted order' })
-    }
-
-    // remove order from pending_orders array in users table
-    const { error } = await supabaseClient.rpc('remove_pending_order', {
-      order_id: id,
-      user_id: user.id,
-    })
-    if (error) {
-      console.log(error)
     }
   }
 
@@ -164,7 +145,7 @@ const IncomingOrder = ({ user }) => {
             <div className="flex flex-col space-y-3">
               <div className="font-bold text-xl">
                 <p>Order #{order.id}</p>
-                <p>{order.ordered_at.toUTCString()}</p>
+                <p>{order.ordered_at.toLocaleString()}</p>
               </div>
               <div className="leading-relaxed">
                 <p>{order.restaurants.name}</p>

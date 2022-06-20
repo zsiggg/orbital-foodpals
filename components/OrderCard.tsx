@@ -9,7 +9,7 @@ export const OrderCard = ({ order }) => {
         <div className="flex-1">
           <div className="text-md font-bold">ID: {order.id}</div>
           <div>{order.order_text}</div>
-          <div>{order.ordered_at}</div>
+          <div>{order.ordered_at.toLocaleString()}</div>
         </div>
 
         <button
