@@ -24,8 +24,6 @@ export const DelivererHome = () => {
         .limit(1)
         .single()
 
-      console.log(pendingOrders)
-
       if (pendingOrders.length > 0) {
         const { data, error } = await supabaseClient
           .from<IncomingOrderDto>('orders')
