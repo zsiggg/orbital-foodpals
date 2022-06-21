@@ -5,24 +5,32 @@ import Head from 'next/head'
 
 import React from 'react'
 import { useUser } from '@supabase/auth-helpers-react'
+import { IncomingOrderDto } from 'types'
 
 export const DelivererHome = () => {
-  const [orders, setOrders] = useState([])
+  const [orders, setOrders] = useState<IncomingOrderDto[]>([])
   const { user, error } = useUser()
 
   useEffect(() => {
     const loadOrders = async () => {
       // select from pending orders array in users; bc of RLS, user will only select own roww
-      const { data: orderIds, error: orderIdsError } = await supabaseClient
+      const {
+        data: { pending_orders: pendingOrders },
+        error,
+      } = await supabaseClient
         .from('users')
         .select('pending_orders')
+        .eq('id', user.id)
+        .limit(1)
+        .single()
 
-      if (orderIds.length > 0) {
-        console.log(orderIds)
+      console.log(pendingOrders)
+
+      if (pendingOrders.length > 0) {
         const { data, error } = await supabaseClient
-          .from('orders')
+          .from<IncomingOrderDto>('orders')
           .select('*')
-          .in('id', orderIds[0].pending_orders)
+          .in('id', pendingOrders)
         setOrders(data)
       }
     }

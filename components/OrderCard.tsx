@@ -1,7 +1,8 @@
 import { useRouter } from 'next/router'
 import React from 'react'
+import { IncomingOrderDto } from 'types'
 
-export const OrderCard = ({ order }) => {
+export const OrderCard = ({ order }: { order: IncomingOrderDto }) => {
   const router = useRouter()
   return (
     <div className="w-full border rounded-md border-inherit p-4">
