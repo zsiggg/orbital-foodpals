@@ -1,31 +1,33 @@
-import { LockClosedIcon } from "@heroicons/react/solid";
-import Link from "next/link";
+import { LockClosedIcon } from '@heroicons/react/solid'
+import Link from 'next/link'
 import { Logo } from './Logo'
-import { useState, Dispatch, SetStateAction } from "react";
-import { useRouter } from "next/router";
-import { useUser } from "@supabase/auth-helpers-react";
-import { useAlert } from "../helpers/alertContext";
-import { supabaseClient } from "@supabase/auth-helpers-nextjs";
+import { useState, Dispatch, SetStateAction } from 'react'
+import { useRouter } from 'next/router'
+import { useUser } from '@supabase/auth-helpers-react'
+import { useAlert } from '../helpers/alertContext'
+import { supabaseClient } from '@supabase/auth-helpers-nextjs'
 //
 export const Login = () => {
   const [alert, setAlert] = useAlert()
-  const router = useRouter();
+  const router = useRouter()
   const { user, error } = useUser()
   if (user) {
-    router.push('/welcome')
+    router.push('/deliverer/home')
   }
 
   async function handleSubmit(e) {
     e.preventDefault()
     if (!formFields.email) {
-      setAlert({ type: 'info', message: "Enter email" });
+      setAlert({ type: 'info', message: 'Enter email' })
     } else if (!formFields.password) {
-      setAlert({ type: 'info', message: "Enter password" });
+      setAlert({ type: 'info', message: 'Enter password' })
     } else {
-      const { user, session, error } = await supabaseClient.auth.signIn(formFields);
+      const { user, session, error } = await supabaseClient.auth.signIn(
+        formFields,
+      )
 
       if (error) {
-        setAlert({ type: 'warning', message: error.message });
+        setAlert({ type: 'warning', message: error.message })
       }
     }
   }

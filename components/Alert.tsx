@@ -82,12 +82,10 @@ export const Alert = () => {
     useEffect(() => {
         if (alert) {
             setDisplayAlert(alerts[alert.type])
+            setAlert(undefined);        // resets the global context immediately
         }
 
-        return () => {
-            setAlert(undefined)     // reset the alert upon unmounting
-        }
-    })
+    }, [setDisplayAlert])
 
     useEffect(() => {
         if (displayAlert) {
