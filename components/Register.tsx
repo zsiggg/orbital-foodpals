@@ -5,6 +5,15 @@ import { supabaseClient } from '@supabase/auth-helpers-nextjs'
 import { useRouter } from 'next/router'
 import { useAlert } from '../helpers/alertContext'
 import { Alert } from './Alert'
+import { DestinationDto, UserDto } from 'types'
+
+type RegisterFormFields = {
+  name: string
+  email: string
+  accom: string
+  phone: string
+  password: string
+}
 
 export const Register = () => {
   const router = useRouter()
@@ -50,31 +59,48 @@ export const Register = () => {
           message: error.status + ': ' + error.message,
         })
       } else {
+        const { data: destination } = await supabaseClient
+          .from<DestinationDto>('destinations')
+          .select('*')
+          .eq('name', formFields.accom)
+          .single()
+
+        const newUser: UserDto = {
+          id: user.id,
+          name: formFields.name,
+          email: formFields.email,
+          default_destination: destination.id,
+          phone: formFields.phone,
+          created_at: new Date(),
+
+          pending_orders: [],
+          is_deliverer: false,
+        }
+        const { data, error } = await supabaseClient
+          .from('users')
+          .insert(newUser, { returning: 'minimal' })
+
+        console.log(data)
+        console.log(error)
+
         router.push('/login')
+
         setAlert({
           type: 'success',
           message:
             'A confirmation message has been sent to your email if it is not associated with an existing account',
         })
-        // send a message -> a confirmation message has been sent to your email, if your email is not associated with an existing account
       }
     }
   }
 
   // not sure if need to include picture
-  type FormFields = {
-    name: string
-    email: string
-    accom: string
-    phone: string
-    password: string
-  }
 
   const emailRegex = /.+(@u.nus.edu)$/
   const phoneRegex = /^([8-9][0-9]{7})$/
   const [formFields, setFormFields]: [
-    FormFields,
-    Dispatch<SetStateAction<FormFields>>,
+    RegisterFormFields,
+    Dispatch<SetStateAction<RegisterFormFields>>,
   ] = useState({
     name: undefined,
     email: undefined,
