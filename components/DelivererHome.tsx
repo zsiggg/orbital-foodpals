@@ -10,6 +10,30 @@ import { IncomingOrderDto } from 'types'
 export const DelivererHome = () => {
   const [orders, setOrders] = useState<IncomingOrderDto[]>([])
   const { user, error } = useUser()
+  const [location, setLocation] = useState('')
+
+  useEffect(() => {
+    const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
+
+    let longitude = 0.0
+    let latitude = 0.0
+
+    const getLocation = async () => {
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        longitude = pos.coords.longitude
+        latitude = pos.coords.latitude
+
+        const res = await fetch(
+          `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?types=poi&access_token=` +
+            accessToken,
+        )
+
+        const data = await res.json()
+        setLocation(data.features[0].place_name)
+      })
+    }
+    getLocation()
+  }, [])
 
   useEffect(() => {
     const loadOrders = async () => {
@@ -43,8 +67,8 @@ export const DelivererHome = () => {
         <title>Home</title>
       </Head>
       <div className="container mx-auto p-4">
-        <div className="text-xl font-bold">Deliverer Home</div>
-        <div>Current Location: 18 Clementi Rd, Singapore 129747</div>
+        <div className="text-2xl font-bold">Deliverer Home</div>
+        <div>Current Location: {location}</div>
         <div className="mt-4">
           <div>
             {orders.map((order) => (
