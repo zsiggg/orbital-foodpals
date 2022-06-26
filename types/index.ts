@@ -1,6 +1,7 @@
 export type IncomingOrderDto = {
   id: number
-  restaurants: RestaurantIdNameDto
+  //why is this named plural?
+  restaurants: RestaurantDto
   order_text: string
   deliverer_id: string
   ordered_at: Date
@@ -9,9 +10,21 @@ export type IncomingOrderDto = {
   cost: number
 }
 
-type RestaurantIdNameDto = {
+export type OrderDto = {
   id: number
-  name: string
+  restaurant_id: RestaurantDto
+  order_text: string
+  // hacky, will need to be refactored
+  buyer_id:  {id: number, name: string}
+  deliverer_id: string
+
+  ordered_at: Date
+  accepted_at: Date
+  cancelled_at: Date
+  is_active: boolean
+  destination_id: DestinationDto
+  cost: number
+  rejected_users: number[]
 }
 
 export type DestinationDto = {
@@ -58,7 +71,7 @@ export type NewOrderDto = {
 
 export type CurrentOrderDto = {
   id: number
-  restaurants: RestaurantIdNameDto
+  restaurants: RestaurantDto
   order_text: string
   buyer_id: string
   ordered_at: string

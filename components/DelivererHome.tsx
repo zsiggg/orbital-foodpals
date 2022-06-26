@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react'
 import { supabaseClient, withPageAuth } from '@supabase/auth-helpers-nextjs'
-import { OrderCard } from './OrderCard'
+import { PendingOrderCard } from './PendingOrderCard'
 import Head from 'next/head'
 
 import React from 'react'
 import { useUser } from '@supabase/auth-helpers-react'
-import { IncomingOrderDto } from 'types'
+import { IncomingOrderDto, OrderDto } from 'types'
+import { AcceptedOrderCard } from './AcceptedOrderCard'
 
 export const DelivererHome = () => {
-  const [orders, setOrders] = useState<IncomingOrderDto[]>([])
+  const [pendingOrders, setPendingOrders] = useState<IncomingOrderDto[]>([])
+  const [acceptedOrders, setAcceptedOrders] = useState<OrderDto[]>([])
+
   const { user, error } = useUser()
   const [location, setLocation] = useState('')
 
@@ -53,11 +56,22 @@ export const DelivererHome = () => {
           .from<IncomingOrderDto>('orders')
           .select('*')
           .in('id', pendingOrders)
-        setOrders(data)
+        setPendingOrders(data)
       }
+    }
+
+    const loadAcceptedOrders = async () => {
+      const { data: acceptedOrders, error } = await supabaseClient
+        .from<OrderDto>('orders')
+        .select(
+          ' *, buyer_id (id, name), restaurant_id (id, name), destination_id (id, name)',
+        )
+        .eq('deliverer_id', user.id)
+      setAcceptedOrders(acceptedOrders)
     }
     if (user) {
       loadOrders()
+      loadAcceptedOrders()
     }
   }, [user])
 
@@ -67,13 +81,36 @@ export const DelivererHome = () => {
         <title>Home</title>
       </Head>
       <div className="container mx-auto p-4">
-        <div className="text-2xl font-bold">Deliverer Home</div>
+        <div className="text-3xl font-bold">📦 Deliverer Home</div>
         <div>Current Location: {location}</div>
-        <div className="mt-4">
-          <div>
-            {orders.map((order) => (
-              <OrderCard order={order} key={order.id} />
-            ))}
+
+        <div className="my-8 shadow-sm rounded-lg p-4 bg-white">
+          <div className="text-lg font-semibold">Current Orders</div>
+          <div className="py-2">
+            {acceptedOrders?.length > 0 ? (
+              <div>
+                {acceptedOrders?.map((order) => (
+                  <AcceptedOrderCard order={order} key={order.id} />
+                ))}
+              </div>
+            ) : (
+              <div>You have no accepted orders.</div>
+            )}
+          </div>
+        </div>
+
+        <div className="my-8 shadow-sm rounded-lg p-4 bg-white">
+          <div className="text-lg font-semibold">Pending Orders</div>
+          <div className="py-2">
+            {pendingOrders?.length > 0 ? (
+              <div>
+                {pendingOrders?.map((order) => (
+                  <PendingOrderCard order={order} key={order.id} />
+                ))}
+              </div>
+            ) : (
+              <div>You have no pending orders.</div>
+            )}
           </div>
         </div>
       </div>
