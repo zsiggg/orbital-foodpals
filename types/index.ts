@@ -1,6 +1,6 @@
 export type IncomingOrderDto = {
   id: number
-  restaurants: RestaurantDto
+  restaurants: RestaurantIdNameDto
   order_text: string
   deliverer_id: string
   ordered_at: Date
@@ -9,7 +9,7 @@ export type IncomingOrderDto = {
   cost: number
 }
 
-type RestaurantDto = {
+type RestaurantIdNameDto = {
   id: number
   name: string
 }
@@ -36,4 +36,31 @@ export type UserDto = {
   coordinates?: string
   pending_orders: IncomingOrderDto[] | number[]
   is_deliverer: boolean
+}
+
+export type RestaurantDto = {
+  id: number
+  name: string
+  menu_link: string
+  location_coordinates: [number, number]
+  location: string
+}
+
+export type NewOrderDto = {
+  id: number
+  restaurant_id: number
+  order_text: string
+  buyer_id: string
+  ordered_at: Date
+  is_active: boolean
+  destination_id: number
+}
+
+export type CurrentOrderDto = {
+  id: number
+  restaurants: RestaurantIdNameDto
+  order_text: string
+  buyer_id: string
+  ordered_at: string
+  is_active: boolean
 }
