@@ -150,7 +150,6 @@ const IncomingOrder = ({ user }) => {
               <div className="leading-relaxed">
                 <p>{order.restaurants.name}</p>
                 <p>{order.destinations.name}</p>
-                <p>{order.cost}</p>
               </div>
               <div className="leading-snug break-words">
                 <p>{order.order_text}</p>
