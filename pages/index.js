@@ -1,4 +1,4 @@
-import { OnBoarding } from '../components/Home'
+import { OnBoarding } from '../components/Onboarding'
 import Head from 'next/head'
 
 const root = () => {

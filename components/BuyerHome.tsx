@@ -5,19 +5,19 @@ import Head from 'next/head'
 
 import React from 'react'
 import { useUser } from '@supabase/auth-helpers-react'
-import { CurrentOrderDto, RestaurantDto } from 'types'
+import { OrderDto, RestaurantDto } from 'types'
 import { OrderCardBuyer } from './OrderCardBuyer'
 
 export const BuyerHome = () => {
   const [restaurants, setRestaurants] = useState<RestaurantDto[]>([])
-  const [currentOrders, setCurrentOrders] = useState<CurrentOrderDto[]>([])
+  const [currentOrders, setCurrentOrders] = useState<OrderDto[]>([])
   const { user, error } = useUser()
 
   useEffect(() => {
     const loadRestaurants = async () => {
       const { data, error } = await supabaseClient
-          .from<RestaurantDto>('restaurants')
-          .select('*')
+        .from<RestaurantDto>('restaurants')
+        .select('*')
       if (error) {
         console.log(error)
       } else {
@@ -27,13 +27,15 @@ export const BuyerHome = () => {
 
     const loadCurrentOrders = async (user) => {
       const { data, error } = await supabaseClient
-        .from<CurrentOrderDto>('orders')
-        .select('id, restaurants (id, name), order_text, buyer_id, ordered_at, is_active')
+        .from<OrderDto>('orders')
+        .select(
+          'id, restaurants (id, name), order_text, buyer_id, ordered_at, is_active',
+        )
         .eq('buyer_id', user.id)
-        .is("is_active", true)
+        .is('is_active', true)
       if (error) {
         console.log(error)
-      } else {  
+      } else {
         setCurrentOrders(data)
       }
     }
@@ -53,7 +55,7 @@ export const BuyerHome = () => {
         <div className="text-xl font-bold">Buyer Home</div>
         <div>Current Location: 18 Clementi Rd, Singapore 129747</div>
 
-        {currentOrders &&
+        {currentOrders && (
           <div className="mt-8">
             <h2 className="text-xl font-semibold pl-2">Current Orders</h2>
             <div className="mt-2">
@@ -62,7 +64,7 @@ export const BuyerHome = () => {
               ))}
             </div>
           </div>
-        }
+        )}
 
         <div className="mt-8">
           <h2 className="text-xl font-semibold pl-2">Restaurants</h2>
