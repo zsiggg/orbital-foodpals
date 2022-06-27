@@ -1,13 +1,19 @@
-import { withPageAuth } from "@supabase/auth-helpers-nextjs";
-import { CurrentOrderMap } from "components/CurrentOrderMap";
+import { withPageAuth } from '@supabase/auth-helpers-nextjs'
+import { CurrentOrderMap } from 'components/CurrentOrderMap'
+import { OrderOverlay } from 'components/OrderOverlay'
 
 const CurrentOrder = ({ user }) => {
-    return (
-        <div className="h-screen">
-            <CurrentOrderMap location={[103.77716348378665, 1.2975835816469965]} />
-        </div>
-    )
+  return (
+    <div className="flex">
+      <div className="h-screen flex-1">
+        <CurrentOrderMap location={[103.77716348378665, 1.2975835816469965]} />
+      </div>
+      <div className="w-1/3">
+        <OrderOverlay />
+      </div>
+    </div>
+  )
 }
 
 export const getServerSideProps = withPageAuth({ redirectTo: '/login' })
-export default CurrentOrder;
+export default CurrentOrder
