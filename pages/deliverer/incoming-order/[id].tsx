@@ -1,4 +1,4 @@
-import type { IncomingOrderDto } from "types/index"
+import { IncomingOrderDto } from 'types/index'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { useAlert } from '../../../helpers/alertContext'
@@ -22,7 +22,7 @@ const IncomingOrder = ({ user }) => {
       const { data: ordersData, error: ordersError } = await supabaseClient
         .from<IncomingOrderDto>('orders')
         .select(
-          'id, restaurants (id, name), order_text, deliverer_id, ordered_at, is_active, destinations (id, name), cost',
+          'id, restaurant_id (id, name), order_text, deliverer_id, ordered_at, is_active, destination_id (id, name), cost',
         )
         .eq('id', orderId)
         .limit(1)
@@ -45,7 +45,11 @@ const IncomingOrder = ({ user }) => {
           { order_id: id, user_id: user.id },
         )
         if (removePendingError) {
-          setAlert({ type: 'warning', message: removePendingError.code + ': ' + removePendingError.message })
+          setAlert({
+            type: 'warning',
+            message:
+              removePendingError.code + ': ' + removePendingError.message,
+          })
         } else {
           setAlert({ type: 'info', message: 'Order has been taken' })
         }
@@ -61,7 +65,7 @@ const IncomingOrder = ({ user }) => {
     query()
 
     // orderId is gotten from url, router and setAlert won't change -> ok to put in dependency array
-  }, [orderId, router, setAlert])
+  }, [id, orderId, router, setAlert, user.id])
 
   async function handleReject() {
     let error = ''
@@ -100,8 +104,8 @@ const IncomingOrder = ({ user }) => {
 
     // remove order from pending_orders array in users table
     const { error: removePendingError } = await supabaseClient.rpc(
-      'remove_pending_order', 
-      { order_id: id, user_id: user.id }
+      'remove_pending_order',
+      { order_id: id, user_id: user.id },
     )
 
     if (updatedOrdersError || removePendingError) {
@@ -110,9 +114,7 @@ const IncomingOrder = ({ user }) => {
       // check if error is caused by order being taken, or something else
       const { data: ordersData, error: ordersError } = await supabaseClient
         .from('orders')
-        .select(
-          'deliverer_id',
-        )
+        .select('deliverer_id')
         .eq('id', orderId)
         .is('deliverer_id', null)
 
@@ -148,8 +150,9 @@ const IncomingOrder = ({ user }) => {
                 <p>{order.ordered_at.toLocaleString()}</p>
               </div>
               <div className="leading-relaxed">
-                <p>{order.restaurants.name}</p>
-                <p>{order.destinations.name}</p>
+                <p>{order.restaurant_id.name}</p>
+                <p>{order.destination_id.name}</p>
+                <p>{order.cost}</p>
               </div>
               <div className="leading-snug break-words">
                 <p>{order.order_text}</p>
