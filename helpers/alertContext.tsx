@@ -1,9 +1,5 @@
 import { useContext, createContext, useState } from 'react'
-
-type Alert = {
-  type: 'danger' | 'warning' | 'info' | 'success'
-  message: string
-}
+import { AlertType } from 'types'
 
 const readAlertContext = createContext(undefined)
 const writeAlertContext = createContext(undefined)
@@ -23,6 +19,6 @@ export default ({ children }) => {
 
 // use this custom hook instead of calling useContext within each page to get both contexts
 export const useAlert: () => [
-  alert: Alert,
-  setAlert: (alert: Alert) => void,
+  alert: AlertType,
+  setAlert: (alert: AlertType) => void,
 ] = () => [useContext(readAlertContext), useContext(writeAlertContext)]
