@@ -6,7 +6,7 @@ import { useRouter } from 'next/router'
 import { useUser } from '@supabase/auth-helpers-react'
 import { useAlert } from '../helpers/alertContext'
 import { supabaseClient } from '@supabase/auth-helpers-nextjs'
-//
+
 export const Login = () => {
   const [alert, setAlert] = useAlert()
   const router = useRouter()

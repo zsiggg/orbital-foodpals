@@ -14,7 +14,7 @@ export const AcceptedOrderCard = ({ order }: { order: OrderDto }) => {
             <div>Ordered By: {order.buyer_id.name}</div>
           </div>
 
-          <div>Restuarant: {order.restaurant_id.name}</div>
+          <div>Restaurant: {order.restaurant_id.name}</div>
           <div>Destination: {order.destination_id.name}</div>
           {/* will need to reformat with dayjs */}
           <div>Accepted at: {order.accepted_at.toLocaleString()}</div>
