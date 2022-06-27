@@ -61,11 +61,19 @@ export const Register = () => {
           displayNow: true
         })
       } else {
-        const { data: destination } = await supabaseClient
+        const { data: destination, error: destinationError } = await supabaseClient
           .from<DestinationDto>('destinations')
           .select('*')
           .eq('name', formFields.accom)
           .single()
+        if (destinationError) {
+          setAlert({ 
+            type: 'warning', 
+            message: destinationError.code + ": " + destinationError.message, 
+            displayNow: true 
+          })
+          return
+        }
 
         const newUser: UserDto = {
           id: user.id,
@@ -78,21 +86,38 @@ export const Register = () => {
           pending_orders: [],
           is_deliverer: false,
         }
-        const { data, error } = await supabaseClient
+        const { error: insertUserError } = await supabaseClient
           .from('users')
           .insert(newUser, { returning: 'minimal' })
-
-        console.log(data)
-        console.log(error)
-
-        router.push('/login')
-
+        if (insertUserError) {
+          setAlert({ 
+            type: 'danger', 
+            message: "Already inserted into auth table!\n" + destinationError.code + ": " + destinationError.message, 
+            displayNow: true 
+          })
+          return
+        }
+        
+        // sign out so that user is not autmatically redirected to home after pushing to login page
+        const { error: signOutError } = await supabaseClient
+          .auth
+          .signOut()
+        if (signOutError) {
+          setAlert({
+            type: 'warning',
+            message: destinationError.code + ": " + destinationError.message, 
+            displayNow: true 
+          })
+          return
+        }
+        
         setAlert({
           type: 'success',
           message:
-            'A confirmation message has been sent to your email if it is not associated with an existing account',
+            'Account created',
           displayNow: false
         })
+        router.push('/login')
       }
     }
   }
@@ -111,10 +136,7 @@ export const Register = () => {
     phone: undefined,
     password: undefined,
   })
-  const [confirmPassword, setConfirmPassword]: [
-    string,
-    Dispatch<SetStateAction<string>>,
-  ] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState<string>('')
 
   return (
     <>
