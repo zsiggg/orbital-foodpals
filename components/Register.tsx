@@ -22,9 +22,9 @@ export const Register = () => {
   async function handleSubmit(e) {
     e.preventDefault()
     if (!formFields.name) {
-      setAlert({ type: 'info', message: 'Enter your name' })
+      setAlert({ type: 'info', message: 'Enter your name', displayNow: true })
     } else if (!emailRegex.test(formFields.email)) {
-      setAlert({ type: 'info', message: 'Please use your NUS email' })
+      setAlert({ type: 'info', message: 'Please use your NUS email', displayNow: true })
     } else if (
       formFields.accom == '' ||
       !accomodationArr.reduce(
@@ -32,22 +32,23 @@ export const Register = () => {
         false,
       )
     ) {
-      setAlert({ type: 'info', message: 'Enter an accomodation' })
+      setAlert({ type: 'info', message: 'Enter an accomodation', displayNow: true })
     } else if (!phoneRegex.test(formFields.phone)) {
       setAlert({
         type: 'info',
         message:
           'Enter a Singapore phone number (starting with 8 or 9) and without +65',
+        displayNow: true 
       })
     } else if (!confirmPassword || !formFields.password) {
-      setAlert({ type: 'info', message: 'Enter password' })
+      setAlert({ type: 'info', message: 'Enter password', displayNow: true })
     } else if (formFields.password.length < 6) {
       setAlert({
         type: 'info',
         message: 'Passwords should be at least 6 characters long',
-      })
+        displayNow: true })
     } else if (confirmPassword != formFields.password) {
-      setAlert({ type: 'warning', message: 'Passwords do not match' })
+      setAlert({ type: 'warning', message: 'Passwords do not match', displayNow: true })
     } else {
       const { user, session, error } = await supabaseClient.auth.signUp({
         email: formFields.email,
@@ -57,6 +58,7 @@ export const Register = () => {
         setAlert({
           type: 'danger',
           message: error.status + ': ' + error.message,
+          displayNow: true
         })
       } else {
         const { data: destination } = await supabaseClient
@@ -89,6 +91,7 @@ export const Register = () => {
           type: 'success',
           message:
             'A confirmation message has been sent to your email if it is not associated with an existing account',
+          displayNow: false
         })
       }
     }
