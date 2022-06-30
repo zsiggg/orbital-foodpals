@@ -9,7 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons'
 
 const Restaurant = ({ user }) => {
-    const [_, setAlert] = useAlert()
+    const [alert, setAlert] = useAlert()
     const router = useRouter()
     const { id } = router.query
     const restaurantId = Number(id)
@@ -51,11 +51,7 @@ const Restaurant = ({ user }) => {
         console.log(user.id)
         e.preventDefault()
         if (!orderText || !orderText.trim()) {
-            // this doesnt work because refreshing page resets the context, and the alert is gone
-            // setAlert({ type: 'info', message: 'Enter your order' })
-            // router.reload()
-
-            alert("Enter your order")
+            setAlert({ type: 'info', message: 'Enter your order', displayNow: true })
             return
         }
         setOrderText(orderText.trim())
@@ -109,7 +105,7 @@ const Restaurant = ({ user }) => {
             } else {
                 console.log(data)
                 router.push('/buyer/home')
-                setAlert({ type: 'success', message: 'Order added' })
+                setAlert({ type: 'success', message: 'Order added', displayNow: false })
             }
         }
 

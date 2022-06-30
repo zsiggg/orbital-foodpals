@@ -29,11 +29,12 @@ const IncomingOrder = ({ user }) => {
         .single()
 
       if (ordersError) {
-        router.push('/deliverer/home')
         setAlert({
           type: 'warning',
           message: ordersError.code + ': ' + ordersError.message,
+          displayNow: false
         })
+        router.push('/deliverer/home')
         console.log(ordersError)
         return
       }
@@ -49,9 +50,10 @@ const IncomingOrder = ({ user }) => {
             type: 'warning',
             message:
               removePendingError.code + ': ' + removePendingError.message,
+            displayNow: false
           })
         } else {
-          setAlert({ type: 'info', message: 'Order has been taken' })
+          setAlert({ type: 'info', message: 'Order has been taken', displayNow: false })
         }
         router.push('/deliverer/home')
         return
@@ -86,9 +88,9 @@ const IncomingOrder = ({ user }) => {
     }
 
     if (error) {
-      setAlert({ type: 'warning', message: error })
+      setAlert({ type: 'warning', message: error, displayNow: false })
     } else {
-      setAlert({ type: 'info', message: 'Rejected order' })
+      setAlert({ type: 'info', message: 'Rejected order', displayNow: false })
     }
     router.push('/deliverer/home')
   }
@@ -119,21 +121,22 @@ const IncomingOrder = ({ user }) => {
         .is('deliverer_id', null)
 
       if (ordersError) {
-        router.push('/deliverer/home')
         setAlert({
           type: 'warning',
           message: ordersError.code + ': ' + ordersError.message,
+          displayNow: false
         })
+        router.push('/deliverer/home')
         console.log(ordersError)
       }
 
       if (ordersData.length == 0) {
+        setAlert({ type: 'info', message: 'Order has been taken', displayNow: false })
         router.push('/deliverer/home')
-        setAlert({ type: 'info', message: 'Order has been taken' })
       }
     } else {
+      setAlert({ type: 'success', message: 'Accepted order', displayNow: false })
       router.push('/deliverer/home')
-      setAlert({ type: 'success', message: 'Accepted order' })
     }
   }
 
