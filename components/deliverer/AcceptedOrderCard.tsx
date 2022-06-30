@@ -11,11 +11,11 @@ export const AcceptedOrderCard = ({ order }: { order: OrderDto }) => {
           <div className="pb-2">
             <div className="text-md font-bold">ID: {order.id}</div>
             <div>{order.order_text}</div>
-            <div>Ordered By: {order.buyer_id.name}</div>
+            <div>Ordered By: {order.buyer.name}</div>
           </div>
 
-          <div>Restaurant: {order.restaurant_id.name}</div>
-          <div>Destination: {order.destination_id.name}</div>
+          <div>Restaurant: {order.restaurant.name}</div>
+          <div>Destination: {order.destination.name}</div>
           {/* will need to reformat with dayjs */}
           <div>Accepted at: {order.accepted_at.toLocaleString()}</div>
         </div>

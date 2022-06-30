@@ -5,7 +5,7 @@ const readAlertContext = createContext(undefined)
 const writeAlertContext = createContext(undefined)
 
 // provides 2 contexts, one for setting the alert, one for reading the alert
-export default ({ children }) => {
+const AlertContext = ({ children }) => {
   const [alert, setAlert] = useState()
 
   return (
@@ -16,6 +16,8 @@ export default ({ children }) => {
     </readAlertContext.Provider>
   )
 }
+
+export default AlertContext
 
 // use this custom hook instead of calling useContext within each page to get both contexts
 export const useAlert: () => [

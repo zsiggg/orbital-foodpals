@@ -1,15 +1,15 @@
-import { DelivererHome } from '../../components/DelivererHome'
 import { Alert } from '../../components/Alert'
 import { withPageAuth } from '@supabase/auth-helpers-nextjs'
+import { BuyerHome } from 'components/buyer/BuyerHome'
 
-const delivererHome = () => {
+const buyerHome = () => {
   return (
     <>
       <Alert />
-      <DelivererHome />
+      <BuyerHome />
     </>
   )
 }
 
-export default delivererHome
+export default buyerHome
 export const getServerSideProps = withPageAuth({ redirectTo: '/login' })

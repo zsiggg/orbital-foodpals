@@ -13,5 +13,5 @@ export const Logo = () => {
         Order in or deliver at your convenience, right now.
       </p>
     </div>
-  );
-};
+  )
+}

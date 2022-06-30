@@ -1,7 +1,7 @@
 import { IncomingOrderDto } from 'types/index'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import { useAlert } from '../../../helpers/alertContext'
+import { useAlert } from '../../../contexts/AlertContext'
 import { supabaseClient, withPageAuth } from '@supabase/auth-helpers-nextjs'
 
 const IncomingOrder = ({ user }) => {
@@ -22,7 +22,7 @@ const IncomingOrder = ({ user }) => {
       const { data: ordersData, error: ordersError } = await supabaseClient
         .from<IncomingOrderDto>('orders')
         .select(
-          'id, restaurant_id (id, name), order_text, deliverer_id, ordered_at, is_active, destination_id (id, name), cost',
+          '*, restaurant:restaurant_id(id, name), deliverer:deliverer_id(id, name), destination:destination_id(id, name)',
         )
         .eq('id', orderId)
         .limit(1)
@@ -153,8 +153,8 @@ const IncomingOrder = ({ user }) => {
                 <p>{order.ordered_at.toLocaleString()}</p>
               </div>
               <div className="leading-relaxed">
-                <p>{order.restaurant_id.name}</p>
-                <p>{order.destination_id.name}</p>
+                <p>{order.restaurant.name}</p>
+                <p>{order.destination.name}</p>
                 <p>{order.cost}</p>
               </div>
               <div className="leading-snug break-words">
