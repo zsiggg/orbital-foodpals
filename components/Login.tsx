@@ -11,6 +11,7 @@ export const Login = () => {
   const [alert, setAlert] = useAlert()
   const router = useRouter()
   const { user, error } = useUser()
+  
   if (user) {
     router.push('/deliverer/home')
   }
@@ -18,16 +19,16 @@ export const Login = () => {
   async function handleSubmit(e) {
     e.preventDefault()
     if (!formFields.email) {
-      setAlert({ type: 'info', message: 'Enter email' })
+      setAlert({ type: 'info', message: 'Enter email', displayNow: true})
     } else if (!formFields.password) {
-      setAlert({ type: 'info', message: 'Enter password' })
+      setAlert({ type: 'info', message: 'Enter password', displayNow: true })
     } else {
       const { user, session, error } = await supabaseClient.auth.signIn(
         formFields,
       )
 
       if (error) {
-        setAlert({ type: 'warning', message: error.message })
+        setAlert({ type: 'warning', message: error.message, displayNow: true })
       }
     }
   }
