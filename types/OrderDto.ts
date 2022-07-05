@@ -16,15 +16,19 @@ export type OrderDto = {
     deliverer: UserDto
   
     ordered_at: Date
+    delivered_at: Date
     accepted_at: Date
     cancelled_at: Date
+
     is_active: boolean
     
     destination_id: number
     destination: DestinationDto
 
     cost: number
-    rejected_users: number[]
+    
+    rejected_users_id: number[]
+    rejected_users: UserDto[]
 }
 
 export type IncomingOrderDto = {
