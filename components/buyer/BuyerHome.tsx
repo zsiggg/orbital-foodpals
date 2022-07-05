@@ -29,7 +29,7 @@ export const BuyerHome = () => {
       const { data, error } = await supabaseClient
         .from<OrderDto>('orders')
         .select(
-          'id, restaurant_id (id, name), order_text, buyer_id, ordered_at, is_active',
+          '*, restaurant:restaurant_id(id, name), buyer:buyer_id(id, name)',
         )
         .eq('buyer_id', user.id)
         .is('is_active', true)

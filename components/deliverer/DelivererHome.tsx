@@ -5,7 +5,7 @@ import Head from 'next/head'
 
 import React from 'react'
 import { useUser } from '@supabase/auth-helpers-react'
-import { IncomingOrderDto, OrderDto } from 'types'
+import { IncomingOrderDto, OrderDto, UserDto } from 'types'
 import { AcceptedOrderCard } from './AcceptedOrderCard'
 
 export const DelivererHome = () => {
@@ -42,20 +42,20 @@ export const DelivererHome = () => {
     const loadOrders = async () => {
       // select from pending orders array in users; bc of RLS, user will only select own roww
       const {
-        data: { pending_orders: pendingOrders },
+        data: { pending_orders_id: pendingOrdersId },
         error,
       } = await supabaseClient
-        .from('users')
-        .select('pending_orders')
+        .from<Partial<UserDto>>('users')
+        .select('pending_orders_id')
         .eq('id', user.id)
         .limit(1)
         .single()
 
-      if (pendingOrders.length > 0) {
+      if (pendingOrdersId?.length > 0) {
         const { data, error } = await supabaseClient
           .from<IncomingOrderDto>('orders')
           .select('*')
-          .in('id', pendingOrders)
+          .in('id', pendingOrdersId)
         setPendingOrders(data)
       }
     }
@@ -64,7 +64,7 @@ export const DelivererHome = () => {
       const { data: acceptedOrders, error } = await supabaseClient
         .from<OrderDto>('orders')
         .select(
-          ' *, buyer_id (id, name), restaurant_id (id, name), destination_id (id, name)',
+          ' *, buyer:buyer_id(id, name), restaurant:resturant_id(id, name), destination:destination_id(id, name)',
         )
         .eq('deliverer_id', user.id)
       setAcceptedOrders(acceptedOrders)

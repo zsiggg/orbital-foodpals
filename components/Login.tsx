@@ -4,7 +4,7 @@ import { Logo } from './Logo'
 import { useState, Dispatch, SetStateAction } from 'react'
 import { useRouter } from 'next/router'
 import { useUser } from '@supabase/auth-helpers-react'
-import { useAlert } from '../helpers/alertContext'
+import { useAlert } from '../contexts/AlertContext'
 import { supabaseClient } from '@supabase/auth-helpers-nextjs'
 
 export const Login = () => {

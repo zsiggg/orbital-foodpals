@@ -1,6 +1,6 @@
 import { withPageAuth } from '@supabase/auth-helpers-nextjs'
 import { CurrentOrderMap } from 'components/CurrentOrderMap'
-import { OrderOverlay } from 'components/OrderOverlay'
+import { OrderOverlay } from 'components/deliverer/OrderOverlay'
 
 const CurrentOrder = ({ user }) => {
   return (

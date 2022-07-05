@@ -1,5 +1,5 @@
 import '../styles/globals.css'
-import AlertContext from '../helpers/alertContext'
+import AlertContext from '../contexts/AlertContext'
 import { UserProvider } from '@supabase/auth-helpers-react'
 import { supabaseClient } from '@supabase/auth-helpers-nextjs'
 

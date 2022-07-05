@@ -13,7 +13,7 @@ export const OrderOverlay = () => {
       const { data: order, error } = await supabaseClient
         .from<OrderDto>('orders')
         .select(
-          ' *, buyer_id (id, name), restaurant_id (id, name), destination_id (id, name)',
+          ' *, buyer:buyer_id(id, name), restaurant:restaurant_id(id, name), destination:destination_id(id, name)',
         )
         .eq('id', orderId)
         .single()
@@ -30,9 +30,7 @@ export const OrderOverlay = () => {
         <div className="m-6">
           <div className="font-bold text-2xl">Order ID {order.id}</div>
           <div className="mt-6">
-            <div className="font-semibold">
-              Ordered by {order.buyer_id.name}
-            </div>
+            <div className="font-semibold">Ordered by {order.buyer.name}</div>
             <div>{order.accepted_at.toLocaleString()}</div>
           </div>
           <div className="mt-6 text-white bg-green-600 w-max py-1 px-1.5 rounded-md">
@@ -43,8 +41,8 @@ export const OrderOverlay = () => {
             <div>{order.order_text}</div>
           </div>
           <div className="mt-6">
-            <div>Restaurant: {order.restaurant_id.name}</div>
-            <div>Destination: {order.destination_id.name}</div>
+            <div>Restaurant: {order.restaurant.name}</div>
+            <div>Destination: {order.destination.name}</div>
           </div>
 
           <button

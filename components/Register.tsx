@@ -3,7 +3,7 @@ import { useState, Dispatch, SetStateAction } from 'react'
 import { accomodationArr, AccomDropdown } from './AccomDropdown'
 import { supabaseClient } from '@supabase/auth-helpers-nextjs'
 import { useRouter } from 'next/router'
-import { useAlert } from '../helpers/alertContext'
+import { useAlert } from '../contexts/AlertContext'
 import { Alert } from './Alert'
 import { DestinationDto, UserDto } from 'types'
 
@@ -75,15 +75,15 @@ export const Register = () => {
           return
         }
 
-        const newUser: UserDto = {
+        const newUser: Partial<UserDto> = {
           id: user.id,
           name: formFields.name,
           email: formFields.email,
-          default_destination: destination.id,
+          default_destination_id: destination.id,
           phone: formFields.phone,
           created_at: new Date(),
 
-          pending_orders: [],
+          pending_orders_id: [],
           is_deliverer: false,
         }
         const { error: insertUserError } = await supabaseClient

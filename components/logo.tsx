@@ -1,5 +1,5 @@
 import Image from 'next/image'
-//
+
 export const Logo = () => {
   return (
     <div>
@@ -13,5 +13,5 @@ export const Logo = () => {
         Order in or deliver at your convenience, right now.
       </p>
     </div>
-  );
-};
+  )
+}
