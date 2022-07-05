@@ -1,118 +1,23 @@
 import { Alert } from 'components/Alert'
 import { supabaseClient, withPageAuth } from '@supabase/auth-helpers-nextjs'
-import { useAlert } from 'contexts/AlertContext'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { OrderDto, RestaurantDto } from 'types'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons'
+import { useAlert } from 'contexts/AlertContext'
 
 const Restaurant = ({ user }) => {
-    const [alert, setAlert] = useAlert()
-    const router = useRouter()
-    const { id } = router.query
-    const restaurantId = Number(id)
+  const [alert, setAlert] = useAlert()
+  const router = useRouter()
+  const { id } = router.query
+  const restaurantId = Number(id)
 
-    const [imgSrc, setImgSrc] = useState<string>()
-    const [restaurant, setRestaurant] = useState<RestaurantDto>()
-    const [orderText, setOrderText] = useState<string>()
-    const [orderId, setOrderId] = useState<number>()
-
-    useEffect(() => {
-        const loadRestaurant = async () => {
-            const {data, error} = await supabaseClient
-                .from<RestaurantDto>('restaurants')
-                .select('*')
-                .eq('id', restaurantId)
-            if (error) {
-                console.log(error)
-            }
-            setRestaurant(data[0])
-        }
-    
-        const loadRestaurantPic = async () => {
-            const {data, error} = await supabaseClient
-                .storage
-                .from('restaurant-photos')
-                .download(restaurantId + '/profile.jpg')
-            if (error) {
-                console.log(error)
-            } else {
-                setImgSrc(URL.createObjectURL(data))
-            }
-        }
-
-        loadRestaurant()
-        loadRestaurantPic()
-    }, [restaurantId])
-
-    function handleSubmit(e) {
-        console.log(user.id)
-        e.preventDefault()
-        if (!orderText || !orderText.trim()) {
-            setAlert({ type: 'info', message: 'Enter your order', displayNow: true })
-            return
-        }
-        setOrderText(orderText.trim())
-
-        const getDestinationId = async () => {
-            const { data, error } = await supabaseClient
-                .from('users')
-                .select('default_destination')
-                .eq('id', user.id)
-                .limit(1)
-                .single()
-            if (error) {
-                console.log(error)
-                throw error
-            } else {
-                console.log(data)
-                return data.default_destination
-            }
-        }
-
-        const addOrder = async (destinationId: number) => {
-            const {data, error} = await supabaseClient
-                .from<OrderDto>('orders')
-                .insert({ 
-                    restaurant_id: restaurant.id,
-                    order_text: orderText,
-                    buyer_id: user.id,
-                    ordered_at: new Date(),
-                    is_active: true,
-                    destination_id: destinationId
-                })
-                .limit(1)
-                .single()
-            if (error) {
-                console.log(error)
-                throw error
-            } else {
-                console.log(data)
-                return data.id
-            }
-        }
-
-        // add to all user's pending order arrays (temporary)
-        // should be adding according to how close the user is to the restaurant
-        const addToPendingOrders = async (orderId: number) => {
-            const { data, error } = await supabaseClient
-                .rpc('add_pending_order_to_all', { order_id: orderId })
-            if (error) {
-                console.log(error)
-                throw error
-            } else {
-                console.log(data)
-                router.push('/buyer/home')
-                setAlert({ type: 'success', message: 'Order added', displayNow: false })
-            }
-        }
-
-        getDestinationId()
-            .then(addOrder)
-            .then(addToPendingOrders)
-            .catch(err => console.log(err))
+  const [imgSrc, setImgSrc] = useState<string>()
+  const [restaurant, setRestaurant] = useState<RestaurantDto>()
+  const [orderText, setOrderText] = useState<string>()
+  const [orderId, setOrderId] = useState<number>()
 
   useEffect(() => {
     const loadRestaurant = async () => {
@@ -145,11 +50,7 @@ const Restaurant = ({ user }) => {
     console.log(user.id)
     e.preventDefault()
     if (!orderText || !orderText.trim()) {
-      // this doesnt work because refreshing page resets the context, and the alert is gone
-      // setAlert({ type: 'info', message: 'Enter your order' })
-      // router.reload()
-
-      alert('Enter your order')
+      setAlert({ type: 'info', message: 'Enter your order', displayNow: true })
       return
     }
     setOrderText(orderText.trim())
@@ -157,7 +58,7 @@ const Restaurant = ({ user }) => {
     const getDestinationId = async () => {
       const { data, error } = await supabaseClient
         .from('users')
-        .select('default_destination_id')
+        .select('default_destination')
         .eq('id', user.id)
         .limit(1)
         .single()
@@ -205,7 +106,7 @@ const Restaurant = ({ user }) => {
       } else {
         console.log(data)
         router.push('/buyer/home')
-        setAlert({ type: 'success', message: 'Order added' })
+        setAlert({ type: 'success', message: 'Order added', displayNow: false })
       }
     }
 

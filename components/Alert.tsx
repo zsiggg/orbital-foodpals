@@ -1,5 +1,6 @@
+import { useAlert } from 'contexts/AlertContext'
 import { useEffect, useState, Dispatch, SetStateAction } from 'react'
-import { useAlert } from '../helpers/alertContext'
+
 import { AlertType, AlertCategory } from 'types'
 
 const alertClasses: {
