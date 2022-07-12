@@ -12,6 +12,7 @@ import { Slideover } from 'components/Slideover'
 export const DelivererHome = () => {
   const [pendingOrders, setPendingOrders] = useState<IncomingOrderDto[]>([])
   const [acceptedOrders, setAcceptedOrders] = useState<OrderDto[]>([])
+  const [userId, setUserId] = useState<string>('')
   const [userName, setUserName] = useState<string>('')
 
   const { user, error } = useUser()
@@ -86,6 +87,7 @@ export const DelivererHome = () => {
       setAcceptedOrders(acceptedOrders)
     }
     if (user) {
+      setUserId(user.id)
       loadUserInfo(user)
       loadOrders()
       loadAcceptedOrders()
@@ -103,7 +105,7 @@ export const DelivererHome = () => {
             <div className="text-3xl font-bold">📦 Deliverer Home</div>
             <div>Current Location: {location}</div>
           </div>
-          <Slideover delivererToggle={true} userName={userName} />
+          <Slideover showBuyerHome={true} userName={userName} userId={userId} />
         </div>
 
         <div className="my-8 shadow-sm rounded-lg p-4 bg-white">

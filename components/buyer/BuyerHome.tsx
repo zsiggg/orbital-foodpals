@@ -12,7 +12,9 @@ import { Slideover } from 'components/Slideover'
 export const BuyerHome = () => {
   const [restaurants, setRestaurants] = useState<RestaurantDto[]>([])
   const [currentOrders, setCurrentOrders] = useState<OrderDto[]>([])
+  const [userId, setUserId] = useState<string>('')
   const [userName, setUserName] = useState<string>('')
+
   const { user, error } = useUser()
 
   useEffect(() => {
@@ -57,6 +59,7 @@ export const BuyerHome = () => {
     }
 
     if (user) {
+      setUserId(user.id)
       loadUserInfo(user)
       loadRestaurants()
       loadCurrentOrders(user)
@@ -74,7 +77,7 @@ export const BuyerHome = () => {
             <div className="text-3xl font-bold">🍔 Buyer Home</div>
             <div>Current Location: 18 Clementi Rd, Singapore 129747</div>
           </div>
-          <Slideover delivererToggle={false} userName={userName}/>
+          <Slideover showBuyerHome={false} userName={userName} userId={userId} />
         </div>
 
         {currentOrders && (

@@ -2,30 +2,70 @@ import { Fragment, useEffect, useState } from 'react'
 import { Dialog, Transition, Switch } from '@headlessui/react'
 import { XIcon } from '@heroicons/react/outline'
 import Link from 'next/link'
+import { supabaseClient } from '@supabase/auth-helpers-nextjs'
+import { UserDto } from 'types'
 import { useRouter } from 'next/router'
 
-export const Slideover = ({ delivererToggle, userName }: { delivererToggle: boolean, userName: string }) => {
+export const Slideover = ({ showBuyerHome, userName, userId }: { showBuyerHome: boolean, userName: string, userId: string }) => {
     const [open, setOpen] = useState<boolean>(false)
-    const [isDeliverer, setIsDeliverer] = useState<boolean>(delivererToggle)
+    const [isActiveDeliverer, setisActiveDeliverer] = useState<boolean>(false)          // binded to value of switch in component, thus can be changed by user
+    const [isActiveDelivererDb, setIsActiveDelivererDb] = useState<boolean>(false)      // holds value of is_deliverer in db; if != isActiveDeliverer, then user clicked the switch
+    const [isDelivererHome, setIsDelivererHome] = useState<boolean>(showBuyerHome)
     const router = useRouter()
 
     useEffect(() => {
-        if (isDeliverer != delivererToggle) {
-            setTimeout(
-                () => {
-                    isDeliverer
-                        ? router.push('/deliverer/home')
-                        : router.push('/buyer/home')
-                }, 500
-            )
-        } 
-    }, [isDeliverer, delivererToggle, router])
+        if (userId) {
+            const loadIsDeliverer = async () => {
+                const { data, error } = await supabaseClient
+                    .from<Partial<UserDto>>('users')
+                    .select('is_deliverer')
+                    .eq('id', userId)
+                    .limit(1)
+                    .single()
+                if (error) {
+                    console.log(error)
+                } else {
+                    setIsActiveDelivererDb(data.is_deliverer)
+                    setisActiveDeliverer(data.is_deliverer)
+                }
+            }    
+            loadIsDeliverer()
+        }
+    }, [userId])
+
+    useEffect(() => {
+        if (userId && isActiveDeliverer != isActiveDelivererDb) {
+            const updateIsDeliverer = async () => {
+                const { data, error } = await supabaseClient
+                    .from<Partial<UserDto>>('users')
+                    .update({ is_deliverer: isActiveDeliverer })
+                    .eq('id', userId)
+                if (error) {
+                    console.log(error)
+                } else {
+                    setIsActiveDelivererDb(isActiveDeliverer)
+                }
+                
+                setTimeout(
+                    () => {
+                        if (isActiveDeliverer && !isDelivererHome) {    // if toggle changed to delivering now, and in buyer home
+                            router.push('/deliverer/home')
+                        } else if (!isActiveDeliverer && isDelivererHome) {     // if toggle changed to not delivering, and in deliverer home
+                            router.push('/buyer/home')
+                        }
+                    }, 300
+                )
+            }
+
+            updateIsDeliverer()
+        }
+    }, [isActiveDeliverer])
 
     return (
         <>
-        <button onClick={() => setOpen(true)} className="p-5 text-gray-500 hover:text-black">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        <button onClick={() => setOpen(true)} className='p-5 text-gray-500 hover:text-black'>
+            <svg xmlns='http://www.w3.org/2000/svg' className='h-8 w-8' fill='none' viewBox='0 0 24 24' stroke='currentColor' strokeWidth='2'>
+                <path strokeLinecap='round' strokeLinejoin='round' d='M4 6h16M4 12h16M4 18h16' />
             </svg>
         </button>
 
@@ -79,27 +119,50 @@ export const Slideover = ({ delivererToggle, userName }: { delivererToggle: bool
                                             <p className='mt-3 text-lg font-medium'>{ userName }</p>
                                         </div>
                                         <Switch.Group>
-                                            <div className='mt-12'>
-                                                <Switch.Label className='mr-3'>
-                                                    Deliverer Mode
+                                            <div className='mt-12 mb-9'>
+                                                <Switch.Label className={`mr-3 ${isActiveDeliverer ? 'font-semibold text-lg' : 'font-normal text-base'}`}>
+                                                    {isActiveDeliverer
+                                                        ? 'Delivering Now'
+                                                        : 'Not Delivering'
+                                                    }
                                                 </Switch.Label>
                                                 <Switch
-                                                    checked={isDeliverer}
-                                                    onChange={setIsDeliverer}
-                                                    className={`${isDeliverer ? 'bg-indigo-700' : 'bg-gray-300'}
+                                                    checked={isActiveDeliverer}
+                                                    onChange={setisActiveDeliverer}
+                                                    className={`${isActiveDeliverer ? 'bg-indigo-700' : 'bg-gray-300'}
                                                     relative inline-flex h-4 w-8 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out`}
                                                 >
                                                     <span className='sr-only'>Use setting</span>
                                                     <span
                                                     aria-hidden='true'
-                                                    className={`${isDeliverer ? 'translate-x-4' : 'translate-x-0'}
+                                                    className={`${isActiveDeliverer ? 'translate-x-4' : 'translate-x-0'}
                                                         pointer-events-none inline-block h-3 w-3 rounded-full bg-white transform transition duration-200 ease-in-out`}
                                                     />
                                                 </Switch>
                                             </div>
                                         </Switch.Group>
+                                        {isDelivererHome &&
+                                            <Link href='/buyer/home'>
+                                                <button className='flex items-center group mt-3'>
+                                                    <svg xmlns='http://www.w3.org/2000/svg' className='h-6 w-6 inline-block text-gray-500 group-hover:text-black' fill='none' viewBox='0 0 24 24' stroke='currentColor' strokeWidth={2}>
+                                                        <path strokeLinecap='round' strokeLinejoin='round' d='M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' />
+                                                    </svg>
+                                                    <span className='ml-2'>Buyer Home</span>
+                                                </button>
+                                            </Link>
+                                        }
+                                        {isActiveDeliverer && !isDelivererHome &&
+                                            <Link href='/deliverer/home'>
+                                                <button className='flex items-center group mt-3'>
+                                                    <svg xmlns='http://www.w3.org/2000/svg' className='h-6 w-6 inline-block text-gray-500 group-hover:text-black' fill='none' viewBox='0 0 24 24' stroke='currentColor' strokeWidth={2}>
+                                                        <path strokeLinecap='round' strokeLinejoin='round' d='M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' />
+                                                    </svg>
+                                                    <span className='ml-2'>Deliverer Home</span>
+                                                </button>
+                                            </Link>
+                                        }
                                         <Link href='/settings'>
-                                            <button className='flex items-center group mt-12'>
+                                            <button className='flex items-center group mt-3'>
                                                 <svg xmlns='http://www.w3.org/2000/svg' className='h-6 w-6 inline-block text-gray-500 group-hover:text-black' fill='none' viewBox='0 0 24 24' stroke='currentColor' strokeWidth='2'>
                                                     <path strokeLinecap='round' strokeLinejoin='round' d='M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z' />
                                                     <path strokeLinecap='round' strokeLinejoin='round' d='M15 12a3 3 0 11-6 0 3 3 0 016 0z' />
