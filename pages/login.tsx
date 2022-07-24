@@ -1,11 +1,11 @@
 import { Alert } from '../components/Alert'
-import { Login } from '../components/Login'
+import { LoginComponent } from '../components/LoginComponent'
 
 const login = () => {
   return (
     <>
       <Alert />
-      <Login />
+      <LoginComponent />
     </>
   )
 }

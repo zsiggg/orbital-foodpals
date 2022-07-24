@@ -3,13 +3,13 @@ import Link from 'next/link'
 import Image from 'next/image'
 
 export const OnBoarding = () => {
-  const [show, setShow] = useState(false)
   return (
     <div className="bg-gray-100">
       <nav className="w-full">
         <div className="py-5 container mx-auto px-6 flex items-center justify-between">
           <div aria-label="logo" role="img">
             <Image
+              data-testid="logo"
               alt="Foodpals Logo"
               src="/tempLogo.svg"
               width={52.5}
@@ -17,7 +17,10 @@ export const OnBoarding = () => {
             />
           </div>
           <Link href="/login">
-            <button className="focus:outline-none lg:text-lg lg:font-bold focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700 bg-transparent transition duration-150 ease-in-out hover:bg-gray-200 rounded border border-indigo-700 text-indigo-700 px-4 sm:px-8 py-1 sm:py-3 text-sm">
+            <button
+              data-testid="sign-in"
+              className="focus:outline-none lg:text-lg lg:font-bold focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700 bg-transparent transition duration-150 ease-in-out hover:bg-gray-200 rounded border border-indigo-700 text-indigo-700 px-4 sm:px-8 py-1 sm:py-3 text-sm"
+            >
               Sign In
             </button>
           </Link>
@@ -48,7 +51,10 @@ export const OnBoarding = () => {
           </div>
           <div className="flex justify-center items-center mb-52">
             <Link href="/register">
-              <button className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700 bg-indigo-700 transition duration-150 ease-in-out hover:bg-indigo-600 lg:text-xl lg:font-bold  rounded text-white px-4 sm:px-10 border border-indigo-700 py-2 sm:py-4 text-sm">
+              <button
+                data-testid="register"
+                className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700 bg-indigo-700 transition duration-150 ease-in-out hover:bg-indigo-600 lg:text-xl lg:font-bold  rounded text-white px-4 sm:px-10 border border-indigo-700 py-2 sm:py-4 text-sm"
+              >
                 Register
               </button>
             </Link>
