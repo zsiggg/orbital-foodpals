@@ -1,7 +1,7 @@
 import { OnBoarding } from '../components/Onboarding'
 import Head from 'next/head'
 
-const root = () => {
+const Root = () => {
   return (
     <div>
       <Head>
@@ -14,4 +14,4 @@ const root = () => {
   )
 }
 
-export default root
+export default Root

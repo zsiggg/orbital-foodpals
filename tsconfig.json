@@ -19,9 +19,11 @@
   "include": [
     "next-env.d.ts",
     "**/*.ts",
-    "**/*.tsx"
-, "pages/Login.js", "pages/_app.js"  ],
-  "exclude": [
-    "node_modules"
-  ]
+    "**/*.tsx",
+    "pages/Login.js",
+    "pages/_app.js",
+    "babel.config.js",
+    "jest.config.js"
+  ],
+  "exclude": ["node_modules"]
 }

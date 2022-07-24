@@ -7,11 +7,11 @@ import { useUser } from '@supabase/auth-helpers-react'
 import { useAlert } from '../contexts/AlertContext'
 import { supabaseClient } from '@supabase/auth-helpers-nextjs'
 
-export const Login = () => {
+export const LoginComponent = () => {
   const [alert, setAlert] = useAlert()
   const router = useRouter()
   const { user, error } = useUser()
-  
+
   if (user) {
     router.push('/deliverer/home')
   }
@@ -19,13 +19,11 @@ export const Login = () => {
   async function handleSubmit(e) {
     e.preventDefault()
     if (!formFields.email) {
-      setAlert({ type: 'info', message: 'Enter email', displayNow: true})
+      setAlert({ type: 'info', message: 'Enter email', displayNow: true })
     } else if (!formFields.password) {
       setAlert({ type: 'info', message: 'Enter password', displayNow: true })
     } else {
-      const { user, session, error } = await supabaseClient.auth.signIn(
-        formFields,
-      )
+      const { error } = await supabaseClient.auth.signIn(formFields)
 
       if (error) {
         setAlert({ type: 'warning', message: error.message, displayNow: true })
