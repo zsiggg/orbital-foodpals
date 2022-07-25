@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { supabaseClient, withPageAuth } from '@supabase/auth-helpers-nextjs'
+import { supabaseClient } from '@supabase/auth-helpers-nextjs'
 import { PendingOrderCard } from './PendingOrderCard'
 import Head from 'next/head'
 
@@ -7,10 +7,13 @@ import React from 'react'
 import { useUser } from '@supabase/auth-helpers-react'
 import { IncomingOrderDto, OrderDto, UserDto } from 'types'
 import { AcceptedOrderCard } from './AcceptedOrderCard'
+import { Slideover } from 'components/Slideover'
 
 export const DelivererHome = () => {
   const [pendingOrders, setPendingOrders] = useState<IncomingOrderDto[]>([])
   const [acceptedOrders, setAcceptedOrders] = useState<OrderDto[]>([])
+  const [userId, setUserId] = useState<string>('')
+  const [userName, setUserName] = useState<string>('')
 
   const { user, error } = useUser()
   const [location, setLocation] = useState('')
@@ -39,6 +42,20 @@ export const DelivererHome = () => {
   }, [])
 
   useEffect(() => {
+    const loadUserInfo = async (user) => {
+      const { data, error } = await supabaseClient
+        .from<Partial<UserDto>>('users')
+        .select('name')
+        .eq('id', user.id)
+        .limit(1)
+        .single()
+      if (error) {
+        console.log(error)
+      } else {
+        setUserName(data.name)
+      }
+    }
+
     const loadOrders = async () => {
       // select from pending orders array in users; bc of RLS, user will only select own roww
       const {
@@ -70,6 +87,8 @@ export const DelivererHome = () => {
       setAcceptedOrders(acceptedOrders)
     }
     if (user) {
+      setUserId(user.id)
+      loadUserInfo(user)
       loadOrders()
       loadAcceptedOrders()
     }
@@ -81,8 +100,13 @@ export const DelivererHome = () => {
         <title>Home</title>
       </Head>
       <div className="container mx-auto p-4">
-        <div className="text-3xl font-bold">📦 Deliverer Home</div>
-        <div>Current Location: {location}</div>
+        <div className='flex justify-between items-center'>
+          <div>
+            <div className="text-3xl font-bold">📦 Deliverer Home</div>
+            <div>Current Location: {location}</div>
+          </div>
+          <Slideover showBuyerHome={true} userName={userName} userId={userId} />
+        </div>
 
         <div className="my-8 shadow-sm rounded-lg p-4 bg-white">
           <div className="text-lg font-semibold">Current Orders</div>

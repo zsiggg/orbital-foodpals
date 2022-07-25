@@ -5,15 +5,33 @@ import Head from 'next/head'
 
 import React from 'react'
 import { useUser } from '@supabase/auth-helpers-react'
-import { OrderDto, RestaurantDto } from 'types'
+import { OrderDto, RestaurantDto, UserDto } from 'types'
 import { OrderCardBuyer } from './OrderCardBuyer'
+import { Slideover } from 'components/Slideover'
 
 export const BuyerHome = () => {
   const [restaurants, setRestaurants] = useState<RestaurantDto[]>([])
   const [currentOrders, setCurrentOrders] = useState<OrderDto[]>([])
+  const [userId, setUserId] = useState<string>('')
+  const [userName, setUserName] = useState<string>('')
+
   const { user, error } = useUser()
 
   useEffect(() => {
+    const loadUserInfo = async (user) => {
+      const { data, error } = await supabaseClient
+        .from<Partial<UserDto>>('users')
+        .select('name')
+        .eq('id', user.id)
+        .limit(1)
+        .single()
+      if (error) {
+        console.log(error)
+      } else {
+        setUserName(data.name)
+      }
+    }
+
     const loadRestaurants = async () => {
       const { data, error } = await supabaseClient
         .from<RestaurantDto>('restaurants')
@@ -41,6 +59,8 @@ export const BuyerHome = () => {
     }
 
     if (user) {
+      setUserId(user.id)
+      loadUserInfo(user)
       loadRestaurants()
       loadCurrentOrders(user)
     }
@@ -52,8 +72,13 @@ export const BuyerHome = () => {
         <title>Home</title>
       </Head>
       <div className="container mx-auto p-4">
-        <div className="text-xl font-bold">Buyer Home</div>
-        <div>Current Location: 18 Clementi Rd, Singapore 129747</div>
+        <div className="flex justify-between items-center">
+          <div>
+            <div className="text-3xl font-bold">🍔 Buyer Home</div>
+            <div>Current Location: 18 Clementi Rd, Singapore 129747</div>
+          </div>
+          <Slideover showBuyerHome={false} userName={userName} userId={userId} />
+        </div>
 
         {currentOrders && (
           <div className="mt-8">
