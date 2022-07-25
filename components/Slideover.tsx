@@ -3,14 +3,18 @@ import { Dialog, Transition, Switch } from '@headlessui/react'
 import { XIcon } from '@heroicons/react/outline'
 import Link from 'next/link'
 import { supabaseClient } from '@supabase/auth-helpers-nextjs'
-import { UserDto } from 'types'
+import { RestaurantDto, UserDto } from 'types'
+import { useInterval } from 'usehooks-ts'
 import { useRouter } from 'next/router'
+import { RealtimeSubscription, User } from '@supabase/supabase-js'
 
-export const Slideover = ({ showBuyerHome, userName, userId }: { showBuyerHome: boolean, userName: string, userId: string }) => {
+export const Slideover = ({ showBuyerHome, userName, userId, onUserRowChange=row => console.log('new user row', row) }: 
+    { showBuyerHome: boolean, userName: string, userId: string, onUserRowChange?: (row: UserDto) => void }) => {
     const [open, setOpen] = useState<boolean>(false)
     const [isActiveDeliverer, setisActiveDeliverer] = useState<boolean>(false)          // binded to value of switch in component, thus can be changed by user
     const [isActiveDelivererDb, setIsActiveDelivererDb] = useState<boolean>(false)      // holds value of is_deliverer in db; if != isActiveDeliverer, then user clicked the switch
     const [isDelivererHome, setIsDelivererHome] = useState<boolean>(showBuyerHome)
+    const [subscription, setSubscription] = useState<RealtimeSubscription>(undefined)
     const router = useRouter()
 
     useEffect(() => {
@@ -60,6 +64,53 @@ export const Slideover = ({ showBuyerHome, userName, userId }: { showBuyerHome: 
             updateIsDeliverer()
         }
     }, [isActiveDeliverer])
+
+    useInterval(() => {
+        // update coordinates in supabase
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+            const updateCoordinates = async () => {
+                const {data, error} = await supabaseClient
+                    .from<Partial<UserDto>>('users')
+                    .update({ 'coordinates':`(${pos.coords.longitude}, ${pos.coords.latitude})` })
+                    .eq('id', userId)
+                
+                    if (error) {
+                        console.log(error)
+                    } else {
+                        console.log('updated deliverer coordinates in supabase', `(${pos.coords.longitude}, ${pos.coords.latitude})`)
+                    }
+            }
+
+            updateCoordinates()
+        })
+    }, isActiveDelivererDb && userId ? 30000 : null)
+
+    useEffect(() => {
+        const subscribeToUsers = async () => {
+            // alert user, tell them why we need permission
+            const permission = await Notification.requestPermission()
+            console.log('notifications permission', permission)
+            if (permission == 'granted') {
+                setSubscription(supabaseClient
+                    .from<UserDto>(`users:id=eq.${userId}`)
+                    .on('UPDATE', row => onUserRowChange(row.new))
+                    .subscribe())
+            } else {
+                // alert user, telling them they will not receive notifications for new pending orders
+            }
+        }
+        if (isActiveDelivererDb) {
+            subscribeToUsers()
+        } else if (subscription) {
+            console.log('removing subscription', subscription)
+            supabaseClient.removeSubscription(subscription)
+        }
+        return (() => {
+            if (subscription) {
+                supabaseClient.removeSubscription(subscription)
+            }
+        })
+    }, [isActiveDelivererDb])
 
     return (
         <>

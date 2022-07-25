@@ -17,6 +17,7 @@
     "@supabase/supabase-js": "^1.35.3",
     "@supabase/ui": "^0.36.5",
     "@tailwindcss/typography": "^0.5.2",
+    "axios": "^0.27.2",
     "easymde": "^2.16.1",
     "mapbox-gl": "^2.9.1",
     "next": "latest",
@@ -25,6 +26,7 @@
     "react-icons": "^4.3.1",
     "react-markdown": "^8.0.3",
     "react-simplemde-editor": "^5.0.2",
+    "usehooks-ts": "^2.6.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
