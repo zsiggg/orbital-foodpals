@@ -3,7 +3,7 @@ import { supabaseClient, withPageAuth } from '@supabase/auth-helpers-nextjs'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { OrderDto, RestaurantDto } from 'types'
+import { OrderDto, RestaurantDto, UserDto } from 'types'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons'
 import { useAlert } from 'contexts/AlertContext'
@@ -57,8 +57,8 @@ const Restaurant = ({ user }) => {
 
     const getDestinationId = async () => {
       const { data, error } = await supabaseClient
-        .from('users')
-        .select('default_destination')
+        .from<UserDto>('users')
+        .select('default_destination_id')
         .eq('id', user.id)
         .limit(1)
         .single()
@@ -67,7 +67,7 @@ const Restaurant = ({ user }) => {
         throw error
       } else {
         console.log(data)
-        return data.default_destination
+        return data.default_destination_id
       }
     }
 

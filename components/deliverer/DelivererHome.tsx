@@ -81,7 +81,7 @@ export const DelivererHome = () => {
       const { data: acceptedOrders, error } = await supabaseClient
         .from<OrderDto>('orders')
         .select(
-          ' *, buyer:buyer_id(id, name), restaurant:resturant_id(id, name), destination:destination_id(id, name)',
+          ' *, buyer:buyer_id(id, name), restaurant:restaurant_id(id, name), destination:destination_id(id, name)',
         )
         .eq('deliverer_id', user.id)
       setAcceptedOrders(acceptedOrders)
