@@ -3,7 +3,6 @@ import { Menu, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/solid'
 
 export const accomodationArr: string[][] = [
-  ["I don't live on campus"],
   [
     'Eusoff Hall',
     'Kent Ridge Hall',

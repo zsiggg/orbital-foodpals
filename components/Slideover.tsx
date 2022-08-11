@@ -8,71 +8,70 @@ import { useInterval } from 'usehooks-ts'
 import { useRouter } from 'next/router'
 import { RealtimeSubscription, User } from '@supabase/supabase-js'
 
-export const Slideover = ({
-  showBuyerHome,
-  userName,
-  userId,
-  onUserRowChange = (row) => console.log('new user row', row),
-}: {
-  showBuyerHome: boolean
-  userName: string
-  userId: string
-  onUserRowChange?: (row: UserDto) => void
-}) => {
-  const [open, setOpen] = useState<boolean>(false)
-  const [isActiveDeliverer, setisActiveDeliverer] = useState<boolean>(false) // binded to value of switch in component, thus can be changed by user
-  const [isActiveDelivererDb, setIsActiveDelivererDb] = useState<boolean>(false) // holds value of is_deliverer in db; if != isActiveDeliverer, then user clicked the switch
-  const [isDelivererHome, setIsDelivererHome] = useState<boolean>(showBuyerHome)
-  const [subscription, setSubscription] =
-    useState<RealtimeSubscription>(undefined)
-  const router = useRouter()
+export const Slideover = ({ showBuyerHome, showSellerHome, userName, userId, onUserRowChange=row => console.log('new user row', row) }: 
+    { showBuyerHome?: boolean, showSellerHome?: boolean, userName: string, userId: string, onUserRowChange?: (row: UserDto) => void }) => {
+    const [open, setOpen] = useState<boolean>(false)
+    const [isActiveDeliverer, setisActiveDeliverer] = useState<boolean>(false)          // binded to value of switch in component, thus can be changed by user
+    const [isActiveDelivererDb, setIsActiveDelivererDb] = useState<boolean>(false)      // holds value of is_deliverer in db; if != isActiveDeliverer, then user clicked the switch
+    const [isDelivererHome, setIsDelivererHome] = useState<boolean>(false)
+    const [isBuyerHome, setIsBuyerHome] = useState<boolean>(false)
+    const [subscription, setSubscription] = useState<RealtimeSubscription>(undefined)
+    const router = useRouter()
 
-  useEffect(() => {
-    if (userId) {
-      const loadIsDeliverer = async () => {
-        const { data, error } = await supabaseClient
-          .from<Partial<UserDto>>('users')
-          .select('is_deliverer')
-          .eq('id', userId)
-          .limit(1)
-          .single()
-        if (error) {
-          console.log(error)
-        } else {
-          setIsActiveDelivererDb(data.is_deliverer)
-          setisActiveDeliverer(data.is_deliverer)
+    useEffect(() => {
+        if (showBuyerHome && !showSellerHome) {
+            setIsDelivererHome(true)
+        } else if (showSellerHome && !showBuyerHome) {
+            setIsBuyerHome(true)
         }
-      }
-      loadIsDeliverer()
-    }
-  }, [userId])
+    }, [showBuyerHome, showSellerHome])
 
-  useEffect(() => {
-    if (userId && isActiveDeliverer != isActiveDelivererDb) {
-      const updateIsDeliverer = async () => {
-        const { data, error } = await supabaseClient
-          .from<Partial<UserDto>>('users')
-          .update({ is_deliverer: isActiveDeliverer })
-          .eq('id', userId)
-        if (error) {
-          console.log(error)
-        } else {
-          setIsActiveDelivererDb(isActiveDeliverer)
+    useEffect(() => {
+        if (userId) {
+            const loadIsDeliverer = async () => {
+                const { data, error } = await supabaseClient
+                    .from<Partial<UserDto>>('users')
+                    .select('is_deliverer')
+                    .eq('id', userId)
+                    .limit(1)
+                    .single()
+                if (error) {
+                    console.log(error)
+                } else {
+                    setIsActiveDelivererDb(data.is_deliverer)
+                    setisActiveDeliverer(data.is_deliverer)
+                }
+            }    
+            loadIsDeliverer()
         }
+      }, [userId])
 
-        setTimeout(() => {
-          if (isActiveDeliverer && !isDelivererHome) {
-            // if toggle changed to delivering now, and in buyer home
-            router.push('/deliverer/home')
-          } else if (!isActiveDeliverer && isDelivererHome) {
-            // if toggle changed to not delivering, and in deliverer home
-            router.push('/buyer/home')
-          }
-        }, 300)
-      }
+    useEffect(() => {
+        if (userId && isActiveDeliverer != isActiveDelivererDb) {
+            const updateIsDeliverer = async () => {
+                const { data, error } = await supabaseClient
+                    .from<Partial<UserDto>>('users')
+                    .update({ is_deliverer: isActiveDeliverer })
+                    .eq('id', userId)
+                if (error) {
+                    console.log(error)
+                } else {
+                    setIsActiveDelivererDb(isActiveDeliverer)
+                }
+                
+                setTimeout(
+                    () => {
+                        if (isActiveDeliverer && !isDelivererHome) {    // if toggle changed to delivering now, and in buyer home or settings
+                            router.push('/deliverer/home')
+                        } else if (!isActiveDeliverer && isDelivererHome) {     // if toggle changed to not delivering, and in deliverer home
+                            router.push('/buyer/home')
+                        }
+                    }, 300
+                )
+            }
 
-      updateIsDeliverer()
-    }
+            updateIsDeliverer()
+        }
   }, [isActiveDeliverer])
 
   useInterval(
@@ -235,98 +234,51 @@ export const Slideover = ({
                                     : 'translate-x-0'
                                 }
                                                         pointer-events-none inline-block h-3 w-3 rounded-full bg-white transform transition duration-200 ease-in-out`}
-                              />
-                            </Switch>
-                          </div>
-                        </Switch.Group>
-                        {isDelivererHome && (
-                          <Link href="/buyer/home">
-                            <button className="flex items-center group mt-3">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-6 w-6 inline-block text-gray-500 group-hover:text-black"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                strokeWidth={2}
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                                />
-                              </svg>
-                              <span className="ml-2">Buyer Home</span>
-                            </button>
-                          </Link>
-                        )}
-                        {isActiveDeliverer && !isDelivererHome && (
-                          <Link href="/deliverer/home">
-                            <button className="flex items-center group mt-3">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-6 w-6 inline-block text-gray-500 group-hover:text-black"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                strokeWidth={2}
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                                />
-                              </svg>
-                              <span className="ml-2">Deliverer Home</span>
-                            </button>
-                          </Link>
-                        )}
-                        <Link href="/settings">
-                          <button className="flex items-center group mt-3">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-6 w-6 inline-block text-gray-500 group-hover:text-black"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                              />
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                              />
-                            </svg>
-                            <span className="ml-2">Settings</span>
-                          </button>
-                        </Link>
-                        <Link href="/api/auth/logout">
-                          <button className="flex items-center group mt-3">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-6 w-6 inline-block text-gray-500 group-hover:text-red-600"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                              />
-                            </svg>
-                            <span className="ml-2 group-hover:text-red-600">
-                              Log out
-                            </span>
-                          </button>
-                        </Link>
-                      </div>
+                                                    />
+                                                </Switch>
+                                            </div>
+                                        </Switch.Group>
+                                        {!isBuyerHome &&
+                                            <Link href='/buyer/home'>
+                                                <button className='flex items-center group mt-3'>
+                                                    <svg xmlns='http://www.w3.org/2000/svg' className='h-6 w-6 inline-block text-gray-500 group-hover:text-black' fill='none' viewBox='0 0 24 24' stroke='currentColor' strokeWidth={2}>
+                                                        <path strokeLinecap='round' strokeLinejoin='round' d='M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' />
+                                                    </svg>
+                                                    <span className='ml-2'>Buyer Home</span>
+                                                </button>
+                                            </Link>
+                                        }
+                                        {isActiveDeliverer && !isDelivererHome &&
+                                            <Link href='/deliverer/home'>
+                                                <button className='flex items-center group mt-3'>
+                                                    <svg xmlns='http://www.w3.org/2000/svg' className='h-6 w-6 inline-block text-gray-500 group-hover:text-black' fill='none' viewBox='0 0 24 24' stroke='currentColor' strokeWidth={2}>
+                                                        <path strokeLinecap='round' strokeLinejoin='round' d='M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' />
+                                                    </svg>
+                                                    <span className='ml-2'>Deliverer Home</span>
+                                                </button>
+                                            </Link>
+                                        }
+                                        <Link href='/settings'>
+                                            <button className='flex items-center group mt-3'>
+                                                <svg xmlns='http://www.w3.org/2000/svg' className='h-6 w-6 inline-block text-gray-500 group-hover:text-black' fill='none' viewBox='0 0 24 24' stroke='currentColor' strokeWidth='2'>
+                                                    <path strokeLinecap='round' strokeLinejoin='round' d='M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z' />
+                                                    <path strokeLinecap='round' strokeLinejoin='round' d='M15 12a3 3 0 11-6 0 3 3 0 016 0z' />
+                                                </svg>
+                                                <span className='ml-2'>Settings</span>
+                                            </button>
+                                        </Link>
+                                        <Link href='/api/auth/logout'>
+                                            <button className='flex items-center group mt-3'>
+                                                <svg xmlns='http://www.w3.org/2000/svg' className='h-6 w-6 inline-block text-gray-500 group-hover:text-red-600' fill='none' viewBox='0 0 24 24' stroke='currentColor' strokeWidth='2'>
+                                                    <path strokeLinecap='round' strokeLinejoin='round' d='M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1' />
+                                                </svg>
+                                                <span className='ml-2 group-hover:text-red-600'>Log out</span>
+                                            </button>
+                                        </Link>
+                                    </div>
+                                </div>
+                            </Dialog.Panel>
+                        </Transition.Child>
                     </div>
                   </Dialog.Panel>
                 </Transition.Child>
