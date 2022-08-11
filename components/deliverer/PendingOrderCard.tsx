@@ -5,12 +5,12 @@ import { IncomingOrderDto, OrderDto } from 'types'
 export const PendingOrderCard = ({ order }: { order: IncomingOrderDto }) => {
   const router = useRouter()
   return (
-    <div className="w-full border rounded-md border-inherit p-4">
+    <div className="w-full border rounded-md border-inherit p-4 mb-3">
       <div className="flex">
         <div className="flex-1">
           <div className="text-md font-bold">ID: {order.id}</div>
           <div>{order.order_text}</div>
-          <div>{order.ordered_at.toLocaleString()}</div>
+          <div>{new Date(order.ordered_at).toDateString()}</div>
         </div>
 
         <button

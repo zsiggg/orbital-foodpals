@@ -46,6 +46,8 @@ export type IncomingOrderDto = {
 
     destination_id: number
     destination: DestinationDto
+
+    accepted_at: Date
     
     cost: number
 }

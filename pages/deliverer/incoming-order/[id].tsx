@@ -32,7 +32,7 @@ const IncomingOrder = ({ user }) => {
         setAlert({
           type: 'warning',
           message: ordersError.code + ': ' + ordersError.message,
-          displayNow: false
+          displayNow: false,
         })
         router.push('/deliverer/home')
         console.log(ordersError)
@@ -50,10 +50,14 @@ const IncomingOrder = ({ user }) => {
             type: 'warning',
             message:
               removePendingError.code + ': ' + removePendingError.message,
-            displayNow: false
+            displayNow: false,
           })
         } else {
-          setAlert({ type: 'info', message: 'Order has been taken', displayNow: false })
+          setAlert({
+            type: 'info',
+            message: 'Order has been taken',
+            displayNow: false,
+          })
         }
         router.push('/deliverer/home')
         return
@@ -124,18 +128,26 @@ const IncomingOrder = ({ user }) => {
         setAlert({
           type: 'warning',
           message: ordersError.code + ': ' + ordersError.message,
-          displayNow: false
+          displayNow: false,
         })
         router.push('/deliverer/home')
         console.log(ordersError)
       }
 
       if (ordersData.length == 0) {
-        setAlert({ type: 'info', message: 'Order has been taken', displayNow: false })
+        setAlert({
+          type: 'info',
+          message: 'Order has been taken',
+          displayNow: false,
+        })
         router.push('/deliverer/home')
       }
     } else {
-      setAlert({ type: 'success', message: 'Accepted order', displayNow: false })
+      setAlert({
+        type: 'success',
+        message: 'Accepted order',
+        displayNow: false,
+      })
       router.push('/deliverer/home')
     }
   }
@@ -150,7 +162,7 @@ const IncomingOrder = ({ user }) => {
             <div className="flex flex-col space-y-3">
               <div className="font-bold text-xl">
                 <p>Order #{order.id}</p>
-                <p>{order.ordered_at.toLocaleString()}</p>
+                <p>{new Date(order.ordered_at).toDateString()}</p>
               </div>
               <div className="leading-relaxed">
                 <p>{order.restaurant.name}</p>

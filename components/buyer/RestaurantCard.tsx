@@ -2,10 +2,14 @@ import { useRouter } from 'next/router'
 import React from 'react'
 import { RestaurantDto } from 'types'
 
-export const RestaurantCard = ({ restaurant }: { restaurant: RestaurantDto }) => {
+export const RestaurantCard = ({
+  restaurant,
+}: {
+  restaurant: RestaurantDto
+}) => {
   const router = useRouter()
   return (
-    <div className="w-full border rounded-md border-inherit p-4">
+    <div className="w-full border rounded-md border-inherit p-4 mb-2">
       <div className="flex">
         <div className="flex-1">
           <div className="text-md font-bold">{restaurant.name}</div>
@@ -15,7 +19,6 @@ export const RestaurantCard = ({ restaurant }: { restaurant: RestaurantDto }) =>
             <span>5 deliverers</span>
           </div>
         </div>
-
 
         <button
           type="button"

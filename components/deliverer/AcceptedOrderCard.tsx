@@ -5,7 +5,7 @@ import { OrderDto } from 'types'
 export const AcceptedOrderCard = ({ order }: { order: OrderDto }) => {
   const router = useRouter()
   return (
-    <div className="w-full border rounded-md border-inherit p-4">
+    <div className="w-full border rounded-md border-inherit p-4 mb-2">
       <div className="flex">
         <div className="flex-1">
           <div className="pb-2">
@@ -17,7 +17,7 @@ export const AcceptedOrderCard = ({ order }: { order: OrderDto }) => {
           <div>Restaurant: {order.restaurant.name}</div>
           <div>Destination: {order.destination.name}</div>
           {/* will need to reformat with dayjs */}
-          <div>Accepted at: {order.accepted_at.toLocaleString()}</div>
+          <div>Accepted at: {new Date(order.accepted_at).toDateString()}</div>
         </div>
 
         <button

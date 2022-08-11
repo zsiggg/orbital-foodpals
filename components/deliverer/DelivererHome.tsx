@@ -72,6 +72,7 @@ export const DelivererHome = () => {
         const { data, error } = await supabaseClient
           .from<IncomingOrderDto>('orders')
           .select('*')
+          .filter('accepted_at', 'is', null)
           .in('id', pendingOrdersId)
         setPendingOrders(data)
       }
@@ -84,6 +85,7 @@ export const DelivererHome = () => {
           ' *, buyer:buyer_id(id, name), restaurant:restaurant_id(id, name), destination:destination_id(id, name)',
         )
         .eq('deliverer_id', user.id)
+        .is('is_active', true)
       setAcceptedOrders(acceptedOrders)
     }
     if (user) {
@@ -100,7 +102,7 @@ export const DelivererHome = () => {
         <title>Home</title>
       </Head>
       <div className="container mx-auto p-4">
-        <div className='flex justify-between items-center'>
+        <div className="flex justify-between items-center">
           <div>
             <div className="text-3xl font-bold">📦 Deliverer Home</div>
             <div>Current Location: {location}</div>
@@ -110,7 +112,7 @@ export const DelivererHome = () => {
 
         <div className="my-8 shadow-sm rounded-lg p-4 bg-white">
           <div className="text-lg font-semibold">Current Orders</div>
-          <div className="py-2">
+          <div className="pt-2">
             {acceptedOrders?.length > 0 ? (
               <div>
                 {acceptedOrders?.map((order) => (
@@ -125,7 +127,7 @@ export const DelivererHome = () => {
 
         <div className="my-8 shadow-sm rounded-lg p-4 bg-white">
           <div className="text-lg font-semibold">Pending Orders</div>
-          <div className="py-2">
+          <div className="pt-2">
             {pendingOrders?.length > 0 ? (
               <div>
                 {pendingOrders?.map((order) => (
