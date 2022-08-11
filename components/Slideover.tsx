@@ -10,11 +10,13 @@ import { RealtimeSubscription, User } from '@supabase/supabase-js'
 
 export const Slideover = ({
   showBuyerHome,
+  showSellerHome,
   userName,
   userId,
   onUserRowChange = (row) => console.log('new user row', row),
 }: {
-  showBuyerHome: boolean
+  showBuyerHome?: boolean
+  showSellerHome?: boolean
   userName: string
   userId: string
   onUserRowChange?: (row: UserDto) => void
@@ -22,10 +24,19 @@ export const Slideover = ({
   const [open, setOpen] = useState<boolean>(false)
   const [isActiveDeliverer, setisActiveDeliverer] = useState<boolean>(false) // binded to value of switch in component, thus can be changed by user
   const [isActiveDelivererDb, setIsActiveDelivererDb] = useState<boolean>(false) // holds value of is_deliverer in db; if != isActiveDeliverer, then user clicked the switch
-  const [isDelivererHome, setIsDelivererHome] = useState<boolean>(showBuyerHome)
+  const [isDelivererHome, setIsDelivererHome] = useState<boolean>(false)
+  const [isBuyerHome, setIsBuyerHome] = useState<boolean>(false)
   const [subscription, setSubscription] =
     useState<RealtimeSubscription>(undefined)
   const router = useRouter()
+
+  useEffect(() => {
+    if (showBuyerHome && !showSellerHome) {
+      setIsDelivererHome(true)
+    } else if (showSellerHome && !showBuyerHome) {
+      setIsBuyerHome(true)
+    }
+  }, [showBuyerHome, showSellerHome])
 
   useEffect(() => {
     if (userId) {
@@ -62,7 +73,7 @@ export const Slideover = ({
 
         setTimeout(() => {
           if (isActiveDeliverer && !isDelivererHome) {
-            // if toggle changed to delivering now, and in buyer home
+            // if toggle changed to delivering now, and in buyer home or settings
             router.push('/deliverer/home')
           } else if (!isActiveDeliverer && isDelivererHome) {
             // if toggle changed to not delivering, and in deliverer home
@@ -239,7 +250,7 @@ export const Slideover = ({
                             </Switch>
                           </div>
                         </Switch.Group>
-                        {isDelivererHome && (
+                        {!isBuyerHome && (
                           <Link href="/buyer/home">
                             <button className="flex items-center group mt-3">
                               <svg
