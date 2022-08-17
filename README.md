@@ -2,6 +2,9 @@
 
 Foodpals is a web app built with NextJS and Supabase, aimed at making food delivery cheaper and more flexible for students.
 
+See our poster and demonstration of the application here:
+- https://drive.google.com/drive/folders/1a_9xg8S55cxjfbEkUWi0UIvEeSO-l4QJ?usp=sharing
+
 ## Getting started
 
 ### Install dependencies
