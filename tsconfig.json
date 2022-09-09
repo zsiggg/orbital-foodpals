@@ -14,15 +14,15 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "baseUrl": "."
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "pages/Login.js",
-    "pages/_app.js",
-    "babel.config.js",
+    "pages/Login.tsx",
+    "pages/_app.tsx",
     "jest.config.js"
   ],
   "exclude": ["node_modules"]
