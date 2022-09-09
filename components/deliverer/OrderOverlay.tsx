@@ -1,8 +1,8 @@
 import { supabaseClient } from '@supabase/auth-helpers-nextjs'
-import { useAlert } from 'contexts/AlertContext'
+import { useAlert } from '../../contexts/AlertContext'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { OrderDto } from 'types'
+import { OrderDto } from '../../types'
 
 export const OrderOverlay = () => {
   const [order, setOrder] = useState<OrderDto>()

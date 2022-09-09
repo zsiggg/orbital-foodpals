@@ -5,7 +5,7 @@ import { supabaseClient } from '@supabase/auth-helpers-nextjs'
 import { useRouter } from 'next/router'
 import { useAlert } from '../contexts/AlertContext'
 import { Alert } from './Alert'
-import { DestinationDto, UserDto } from 'types'
+import { DestinationDto, UserDto } from '../types'
 
 type RegisterFormFields = {
   name: string
@@ -24,7 +24,11 @@ export const Register = () => {
     if (!formFields.name) {
       setAlert({ type: 'info', message: 'Enter your name', displayNow: true })
     } else if (!emailRegex.test(formFields.email)) {
-      setAlert({ type: 'info', message: 'Please use your NUS email', displayNow: true })
+      setAlert({
+        type: 'info',
+        message: 'Please use your NUS email',
+        displayNow: true,
+      })
     } else if (
       formFields.accom == '' ||
       !accomodationArr.reduce(
@@ -32,13 +36,17 @@ export const Register = () => {
         false,
       )
     ) {
-      setAlert({ type: 'info', message: 'Enter an accomodation', displayNow: true })
+      setAlert({
+        type: 'info',
+        message: 'Enter an accomodation',
+        displayNow: true,
+      })
     } else if (!phoneRegex.test(formFields.phone)) {
       setAlert({
         type: 'info',
         message:
           'Enter a Singapore phone number (starting with 8 or 9) and without +65',
-        displayNow: true 
+        displayNow: true,
       })
     } else if (!confirmPassword || !formFields.password) {
       setAlert({ type: 'info', message: 'Enter password', displayNow: true })
@@ -46,9 +54,14 @@ export const Register = () => {
       setAlert({
         type: 'info',
         message: 'Passwords should be at least 6 characters long',
-        displayNow: true })
+        displayNow: true,
+      })
     } else if (confirmPassword != formFields.password) {
-      setAlert({ type: 'warning', message: 'Passwords do not match', displayNow: true })
+      setAlert({
+        type: 'warning',
+        message: 'Passwords do not match',
+        displayNow: true,
+      })
     } else {
       const { user, session, error } = await supabaseClient.auth.signUp({
         email: formFields.email,
@@ -58,25 +71,26 @@ export const Register = () => {
         setAlert({
           type: 'danger',
           message: error.status + ': ' + error.message,
-          displayNow: true
+          displayNow: true,
         })
       } else {
-        const { data: destination, error: destinationError } = await supabaseClient
-          .from<DestinationDto>('destinations')
-          .select('*')
-          .eq('name', formFields.accom)
-          .single()
+        const { data: destination, error: destinationError } =
+          await supabaseClient
+            .from<DestinationDto>('destinations')
+            .select('*')
+            .eq('name', formFields.accom)
+            .single()
         if (destinationError) {
-          setAlert({ 
-            type: 'warning', 
-            message: destinationError.code + ": " + destinationError.message, 
-            displayNow: true 
+          setAlert({
+            type: 'warning',
+            message: destinationError.code + ': ' + destinationError.message,
+            displayNow: true,
           })
           return
         }
 
         const newUser: Partial<UserDto> = {
-          id: user.id,
+          id: user?.id,
           name: formFields.name,
           email: formFields.email,
           default_destination_id: destination.id,
@@ -90,32 +104,33 @@ export const Register = () => {
           .from('users')
           .insert(newUser, { returning: 'minimal' })
         if (insertUserError) {
-          setAlert({ 
-            type: 'danger', 
-            message: "Already inserted into auth table!\n" + destinationError.code + ": " + destinationError.message, 
-            displayNow: true 
+          setAlert({
+            type: 'danger',
+            message:
+              'Already inserted into auth table!\n' +
+              destinationError?.code +
+              ': ' +
+              destinationError?.message,
+            displayNow: true,
           })
           return
         }
-        
+
         // sign out so that user is not autmatically redirected to home after pushing to login page
-        const { error: signOutError } = await supabaseClient
-          .auth
-          .signOut()
+        const { error: signOutError } = await supabaseClient.auth.signOut()
         if (signOutError) {
           setAlert({
             type: 'warning',
-            message: destinationError.code + ": " + destinationError.message, 
-            displayNow: true 
+            message: destinationError.code + ': ' + destinationError.message,
+            displayNow: true,
           })
           return
         }
-        
+
         setAlert({
           type: 'success',
-          message:
-            'Account created',
-          displayNow: false
+          message: 'Account created',
+          displayNow: false,
         })
         router.push('/login')
       }
@@ -232,6 +247,7 @@ export const Register = () => {
                   +65
                 </span>
                 <input
+                  aria-label="Phone Number"
                   className="w-full bg-gray-100 px-4 py-2 rounded-lg focus:outline-none"
                   type="tel"
                   name="tel"
